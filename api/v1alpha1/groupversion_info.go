@@ -16,7 +16,7 @@ limitations under the License.
 
 // Package v1alpha1 contains API Schema definitions for the linuxsuren.github.io v1alpha1 API group
 // +kubebuilder:object:generate=true
-// +groupName=linuxsuren.github.io.my.domain
+// +groupName=linuxsuren.github.io
 package v1alpha1
 
 import (
