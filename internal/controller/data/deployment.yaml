@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    ailink.io/application_kind: gitpod
+    ailink.io/application: {{.ObjectMeta.Name}}
+  name: {{.ObjectMeta.Name}}
+  namespace: {{.ObjectMeta.Namespace}}
+  ownerReferences:
+    - apiVersion: devops.ailink.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: GitPod
+      name: {{.ObjectMeta.Name}}
+      uid: {{.ObjectMeta.UID}}
+spec:
+  {{ if eq .Status.Phase "Off" }}
+  replicas: 0
+  {{else}}
+  replicas: {{.Spec.Replicas}}
+  {{ end }}
+  selector:
+    matchLabels:
+      ailink.io/application_kind: gitpod
+      ailink.io/application: {{.ObjectMeta.Name}}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        ailink.io/application_kind: gitpod
+        ailink.io/application: {{.ObjectMeta.Name}}
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  ailink.io/application_kind: gitpod
+                  ailink.io/application: {{.ObjectMeta.Name}}
+              topologyKey: kubernetes.io/hostname
+            weight: 5
+      initContainers:
+        - image: {{.Spec.Image}}
+          imagePullPolicy: {{index .ObjectMeta.Annotations "devops.ailink.io/image-pull-policy"}}
+          name: init
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              set -x
+              cd /home/workspace
+              cp /usr/local/* /usr/local-bak -r -n
+              chmod 1777 /tmp
+              [[ -d "/home/workspace-bak/.cache" ]] && [[ ! -d "/home/workspace/.cache" ]] && cp /home/workspace-bak/.cache /home/workspace -a -r -n
+              [[ -d "/home/workspace-bak/.local" ]] && [[ ! -d "/home/workspace/.local" ]] && cp /home/workspace-bak/.local /home/workspace -a -r -n
+              [[ -d "/home/workspace-bak/.oh-my-zsh" ]] && [[ ! -d "/home/workspace/.oh-my-zsh" ]] && cp /home/workspace-bak/.oh-my-zsh /home/workspace -a -r -n
+              [[ -d "/home/workspace-bak/.openvscode-server" ]] && [[ ! -d "/home/workspace/.openvscode-server" ]] && cp /home/workspace-bak/.openvscode-server /home/workspace -a -r -n
+              [[ -d "/home/workspace-bak/.sdkman" ]] && [[ ! -d "/home/workspace/.sdkman" ]] && cp /home/workspace-bak/.sdkman /home/workspace -a -r -n
+              [[ -e "/home/workspace-bak/.bashrc" ]] && [[ ! -e "/home/workspace/.bashrc" ]] && cp /home/workspace-bak/.bashrc /home/workspace
+              [[ -e "/home/workspace-bak/.zshrc" ]] && [[ ! -e "/home/workspace/.zshrc" ]] && cp /home/workspace-bak/.zshrc /home/workspace
+              [[ -e "/var/data/openvscode-server-back/data/Machine/settings.json" ]] && [[ ! -e "/home/workspace/.openvscode-server/data/Machine/settings.json" ]] && cp /var/data/openvscode-server-back/data/Machine/settings.json /home/workspace/.openvscode-server/data/Machine/settings.json
+              {{ if .Spec.Repository }}
+              {{ if .Spec.Repository.Username }}
+              git config --global user.email {{.Spec.Repository.Username}}@ailinking.com
+              git config --global user.name {{.Spec.Repository.Username}}
+              {{ end }}
+              git clone {{.Spec.Repository.URL}} --depth 1 --single-branch | exit 0
+              {{ else }}
+              echo "no repository given"
+              {{ end }}
+              {{ if .Spec.InitScript }}
+              {{ .Spec.InitScript }}
+              {{ else }}
+              echo "no custom script given"
+              {{ end }}
+          volumeMounts:
+            - mountPath: /home/workspace
+              name: cache
+              subPath: workspace
+            - mountPath: /usr/local-bak
+              name: cache
+              subPath: usr-local
+            - mountPath: /tmp
+              name: cache
+              subPath: tmp
+            - mountPath: /var/data/openvscode-server-back/data/Machine
+              name: config
+          securityContext:
+            allowPrivilegeEscalation: true
+            runAsUser: 0
+            privileged: true
+      containers:
+        - image: {{.Spec.Image}}
+          imagePullPolicy: {{index .ObjectMeta.Annotations "devops.ailink.io/image-pull-policy"}}
+          name: server
+          env:
+            - name: GITPOD_VERSION
+              value: "1"
+          {{ range $key, $value := .Spec.Environment }}
+            - name: {{ $key }}
+              value: "{{ $value }}"
+          {{ end }}
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: {{.Spec.CPU}}
+              memory: {{.Spec.Memory}}
+          ports:
+            - containerPort: 3000
+              name: http
+              protocol: TCP
+          securityContext:
+            allowPrivilegeEscalation: true
+            runAsUser: 0
+            privileged: true
+          volumeMounts:
+            - mountPath: /home/workspace
+              name: cache
+              subPath: workspace
+            - mountPath: /root
+              name: cache
+              subPath: rootHome
+            - mountPath: /usr/local
+              name: cache
+              subPath: usr-local
+            - mountPath: /tmp
+              name: cache
+              subPath: tmp
+            - mountPath: /var/lib/apt
+              name: cache
+              subPath: apt
+            - mountPath: /var/cache
+              name: cache
+              subPath: cache
+            - mountPath: /var/lib/docker
+              name: cache
+              subPath: docker
+            - mountPath: /var/run
+              name: container-runtime
+        - image: ghcr.io/linuxsuren/library/docker:27.0.3-dind
+          imagePullPolicy: {{index .ObjectMeta.Annotations "devops.ailink.io/image-pull-policy"}}
+          name: docker
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: {{.Spec.CPU}}
+              memory: {{.Spec.Memory}}
+          securityContext:
+            allowPrivilegeEscalation: true
+            runAsUser: 0
+            privileged: true
+          volumeMounts:
+            - mountPath: /var/lib/docker
+              name: cache
+              subPath: docker
+            - mountPath: /var/run
+              name: container-runtime
+              readOnly: false
+      securityContext:
+        runAsNonRoot: false
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: {{.ObjectMeta.Name}}
+        - name: container-runtime
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: {{.ObjectMeta.Name}}

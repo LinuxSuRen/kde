@@ -1,0 +1,4 @@
+## Append samples of your project ##
+resources:
+- linuxsuren.github.io_v1alpha1_devspace.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

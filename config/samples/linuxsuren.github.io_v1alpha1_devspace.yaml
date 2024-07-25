@@ -1,0 +1,9 @@
+apiVersion: linuxsuren.github.io.my.domain/v1alpha1
+kind: DevSpace
+metadata:
+  labels:
+    app.kubernetes.io/name: kde
+    app.kubernetes.io/managed-by: kustomize
+  name: devspace-sample
+spec:
+  # TODO(user): Add fields here

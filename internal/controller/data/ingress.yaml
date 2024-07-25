@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    ailink.io/application: {{.ObjectMeta.Name}}
+    ailink.io/application_kind: gitpod
+  annotations:
+    {{ if .Spec.Auth.BasicAuth }}
+    nginx.ingress.kubernetes.io/auth-secret: {{.ObjectMeta.Name}}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    {{ else }}
+    ailink.io/auth-type: none
+    {{ end }}
+  name: {{.ObjectMeta.Name}}
+  namespace: {{.ObjectMeta.Namespace}}
+  ownerReferences:
+    - apiVersion: devops.ailink.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: GitPod
+      name: {{.ObjectMeta.Name}}
+      uid: {{.ObjectMeta.UID}}
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: {{.Status.Link}}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{.ObjectMeta.Name}}
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix

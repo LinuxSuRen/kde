@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  settings.json: |
+    {
+        "webhook.interval": 3000,
+        "webhook.address": "http://al-component-al-cloud-apiserver.al-component-system.svc:9090/al-apis/gitpods/webhook/v1?namespace={{.ObjectMeta.Namespace}}&gitpod={{.ObjectMeta.Name}}"
+    }
+kind: ConfigMap
+metadata:
+  name: {{.ObjectMeta.Name}}
+  namespace: {{.ObjectMeta.Namespace}}

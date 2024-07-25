@@ -1,0 +1,27 @@
+# permissions for end users to edit devspaces.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: kde
+    app.kubernetes.io/managed-by: kustomize
+  name: devspace-editor-role
+rules:
+- apiGroups:
+  - linuxsuren.github.io.my.domain
+  resources:
+  - devspaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - linuxsuren.github.io.my.domain
+  resources:
+  - devspaces/status
+  verbs:
+  - get
