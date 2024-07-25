@@ -166,6 +166,8 @@ spec:
             - mountPath: /var/run
               name: container-runtime
               readOnly: false
+            - mountPath: /etc/docker
+              name: config
       securityContext:
         runAsNonRoot: false
       volumes:
