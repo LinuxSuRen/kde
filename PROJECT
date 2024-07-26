@@ -2,7 +2,7 @@
 # This file is used to track the info used to scaffold your project
 # and allow the plugins properly work.
 # More info: https://book.kubebuilder.io/reference/project-config.html
-domain: github.com/linuxsuren
+domain: github.com
 layout:
 - go.kubebuilder.io/v4
 projectName: kde
@@ -12,9 +12,18 @@ resources:
     crdVersion: v1
     namespaced: true
   controller: true
-  domain: github.com/linuxsuren
+  domain: github.com
   group: linuxsuren.github.io
   kind: DevSpace
+  path: github.com/linuxsuren/kde/api/v1alpha1
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: github.com
+  group: linuxsuren.github.io
+  kind: User
   path: github.com/linuxsuren/kde/api/v1alpha1
   version: v1alpha1
 version: "3"

@@ -37,3 +37,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users/status
+  verbs:
+  - get
+  - patch
+  - update
