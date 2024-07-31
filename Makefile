@@ -2,6 +2,7 @@
 IMG ?= ghcr.io/linuxsuren/kde/controller:latest
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.30.0
+GV="linuxsuren.github.io:v1alpha1"
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -147,6 +148,12 @@ undeploy: kustomize ## Undeploy controller from the K8s cluster specified in ~/.
 
 install-tools:
 	hd i kubebuilder@v4.1.1
+
+atest:
+	atest server --local-storage 'hack/atest/*.yaml' --http-port 7890
+
+clientset:
+	./hack/generate_client.sh ${GV}
 
 ## Location to install dependencies to
 LOCALBIN ?= $(shell pwd)/bin

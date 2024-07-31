@@ -1,4 +1,4 @@
-apiVersion: linuxsuren.github.io.my.domain/v1alpha1
+apiVersion: linuxsuren.github.io/v1alpha1
 kind: DevSpace
 metadata:
   labels:

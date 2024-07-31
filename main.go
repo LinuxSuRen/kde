@@ -21,18 +21,48 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
+	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 func main() {
+	// creates the in-cluster config
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	config, err = clientcmd.BuildConfigFromFlags("", "/home/workspace/.kube/config")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// creates the clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	var kClient *kdeClient.Clientset
+	kClient, err = kdeClient.NewForConfig(config)
+
+	server := &apiserver.Server{
+		Client:  clientset,
+		KClient: kClient,
+	}
+
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-	r.GET("/devspace", apiserver.ListDevSpace)
-	r.POST("/devspace", apiserver.CreateDevSpace)
-	r.DELETE("/devspace/:devspace", apiserver.DeleteDevSpace)
-	r.PUT("/devspace/:devspace", apiserver.UpdateDevSpace)
+	r.GET("/devspace", server.ListDevSpace)
+	r.POST("/devspace", server.CreateDevSpace)
+	r.DELETE("/devspace/:devspace", server.DeleteDevSpace)
+	r.PUT("/devspace/:devspace", server.UpdateDevSpace)
+	r.GET("/devspace/:devspace", server.GetDevSpace)
 	r.Run()
 }

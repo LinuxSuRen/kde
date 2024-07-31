@@ -16,13 +16,87 @@ limitations under the License.
 
 package apiserver
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"net/http"
 
-func CreateDevSpace(c *gin.Context) {
+	"github.com/gin-gonic/gin"
+	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
+	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+)
+
+type Server struct {
+	Client  *kubernetes.Clientset
+	KClient *kdeClient.Clientset
 }
 
-func ListDevSpace(c *gin.Context) {}
+func (s *Server) CreateDevSpace(c *gin.Context) {
+	fmt.Println("CreateDevSpace")
+	// clone git repo
 
-func DeleteDevSpace(c *gin.Context) {}
+	// find the config file
 
-func UpdateDevSpace(c *gin.Context) {}
+	// create the devspace resource
+	devSpace := &v1alpha1.DevSpace{}
+	if err := c.BindJSON(devSpace); err != nil {
+		c.Error(err)
+	} else {
+		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Create(c.Request.Context(), devSpace, metav1.CreateOptions{})
+		if err != nil {
+			c.Error(err)
+		} else {
+			c.JSON(http.StatusOK, result)
+		}
+	}
+
+	// query the status of the devspace resource
+
+	// return the space address
+}
+
+func (s *Server) ListDevSpace(c *gin.Context) {
+	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").List(c.Request.Context(), metav1.ListOptions{})
+	if err != nil {
+		c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
+
+func (s *Server) DeleteDevSpace(c *gin.Context) {
+	name := c.Params.ByName("devspace")
+	err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Delete(c.Request.Context(), name, metav1.DeleteOptions{})
+	if err != nil {
+		c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, "")
+	}
+}
+
+func (s *Server) UpdateDevSpace(c *gin.Context) {
+	name := c.Params.ByName("devspace")
+	devSpace := &v1alpha1.DevSpace{}
+	devSpace.Name = name
+	if err := c.BindJSON(devSpace); err != nil {
+		c.Error(err)
+	} else {
+		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Update(c.Request.Context(), devSpace, metav1.UpdateOptions{})
+		if err != nil {
+			c.Error(err)
+		} else {
+			c.JSON(http.StatusOK, result)
+		}
+	}
+}
+
+func (s *Server) GetDevSpace(c *gin.Context) {
+	name := c.Params.ByName("devspace")
+	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Get(c.Request.Context(), name, metav1.GetOptions{})
+	if err != nil {
+		c.Error(err)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
+}
