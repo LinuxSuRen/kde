@@ -6,14 +6,49 @@ const route = useRoute()
 const phase = ref('')
 const link = ref('')
 
-const loading = () => {
-    fetch('/api/devspace/devspace-sample', {
+const createDevSpace = async (name: string) =>  {
+    fetch(`/api/devspace`, {
+        method: 'POST',
+        body: `{
+            "apiVersion": "linuxsuren.github.io/v1alpha1",
+            "kind": "DevSpace",
+            "metadata": {
+              "name": "${name}",
+              "annotations": {
+                "storageTemporary": "a",
+                "ingressMode": "path"
+              }
+            },
+            "spec": {
+              "cpu": "100m",
+              "memory": "100Mi",
+              "host": "kubernetes.docker.internal"
+            }
+            }`
+    }).then(res => {
+        return res.json()
+    }).then(res => {
+        phase.value = res?.Status?.Phase
+        link.value
+    })
+}
+
+const loading = async () => {
+    const name = 'sample'
+
+    fetch(`/api/devspace/${name}`, {
         method: 'GET'
     }).then(res => {
         return res.json()
     }).then(res => {
-        phase.value = res.Status.Phase
-        link.value = res.Status.Link
+        phase.value = res?.Status?.Phase
+        link.value = res?.Status?.Link
+
+        if (res?.ErrStatus?.code === 404) {
+           createDevSpace(name)
+        }
+    }).catch(err => {
+        console.log(err)
     })
 }
 

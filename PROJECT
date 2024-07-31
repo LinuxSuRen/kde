@@ -15,7 +15,7 @@ resources:
   domain: github.com
   group: linuxsuren.github.io
   kind: DevSpace
-  path: github.com/linuxsuren/kde/api/v1alpha1
+  path: github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1
   version: v1alpha1
 - api:
     crdVersion: v1
@@ -24,6 +24,6 @@ resources:
   domain: github.com
   group: linuxsuren.github.io
   kind: User
-  path: github.com/linuxsuren/kde/api/v1alpha1
+  path: github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1
   version: v1alpha1
 version: "3"

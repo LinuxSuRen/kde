@@ -20,7 +20,7 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	"github.com/linuxsuren/kde/api/v1alpha1"
+	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"

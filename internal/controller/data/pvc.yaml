@@ -1,13 +1,14 @@
+{{if not .ObjectMeta.Annotations.storageTemporary}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: {{.ObjectMeta.Name}}
   namespace: {{.ObjectMeta.Namespace}}
   ownerReferences:
-    - apiVersion: devops.ailink.io/v1
+    - apiVersion: linuxsuren.github.io/v1alpha1
       blockOwnerDeletion: true
       controller: true
-      kind: GitPod
+      kind: DevSpace
       name: {{.ObjectMeta.Name}}
       uid: {{.ObjectMeta.UID}}
 spec:
@@ -22,3 +23,4 @@ spec:
   resources:
     requests:
       storage: {{.Spec.Storage}}
+{{end}}

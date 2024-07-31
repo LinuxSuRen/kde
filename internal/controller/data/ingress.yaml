@@ -14,22 +14,29 @@ metadata:
   name: {{.ObjectMeta.Name}}
   namespace: {{.ObjectMeta.Namespace}}
   ownerReferences:
-    - apiVersion: devops.ailink.io/v1
+    - apiVersion: linuxsuren.github.io/v1alpha1
       blockOwnerDeletion: true
       controller: true
-      kind: GitPod
+      kind: DevSpace
       name: {{.ObjectMeta.Name}}
       uid: {{.ObjectMeta.UID}}
 spec:
-  ingressClassName: nginx
+  # ingressClassName: nginx
   rules:
-    - host: {{.Status.Link}}
-      http:
+    - http:
         paths:
           - backend:
               service:
                 name: {{.ObjectMeta.Name}}
                 port:
                   number: 3000
+            {{if ne .ObjectMeta.Annotations.ingressMode "path"}}
             path: /
+            {{end}}
+            {{if eq .ObjectMeta.Annotations.ingressMode "path"}}
+            path: /{{.ObjectMeta.Name}}
+            {{end}}
             pathType: Prefix
+      {{if ne .ObjectMeta.Annotations.ingressMode "path"}}
+      host: {{.Status.Link}}
+      {{ end }}

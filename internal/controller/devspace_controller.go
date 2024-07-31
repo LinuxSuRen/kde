@@ -33,7 +33,7 @@ import (
 
 	"github.com/go-logr/logr"
 	"github.com/johnaoss/htpasswd/apr1"
-	"github.com/linuxsuren/kde/api/v1alpha1"
+	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -72,10 +72,10 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 		return
 	}
 
-	if mode, ok := devSpace.Annotations[v1alpha1.AnnoKeyMaintainMode]; !ok || mode != PolicyAlways {
-		r.log.Info("skip reconcile gitpod", "maintain mode", mode)
-		return
-	}
+	// if mode, ok := devSpace.Annotations[v1alpha1.AnnoKeyMaintainMode]; !ok || mode != PolicyAlways {
+	// 	r.log.Info("skip reconcile gitpod", "maintain mode", mode)
+	// 	return
+	// }
 
 	setDefaultValueForGitPod(devSpace, r.Ingress)
 	devSpace = r.updateStatus(devSpace)
@@ -127,7 +127,7 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 
 func setDefaultValueForGitPod(gitpod *v1alpha1.DevSpace, ingress string) {
 	if gitpod.Spec.Image == "" {
-		gitpod.Spec.Image = "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
+		gitpod.Spec.Image = "ghcr.io/linuxsuren/openvscode-server-golang:v0.0.8"
 	}
 	if gitpod.Spec.Host == "" {
 		gitpod.Spec.Host = ingress

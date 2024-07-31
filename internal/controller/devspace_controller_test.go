@@ -17,7 +17,7 @@ limitations under the License.
 package controller
 
 import (
-	ailinkiov1 "al-cloud/pkg/api/devops.ailink.io/v1"
+	ailinkiov1 "al-cloud/pkg/api/linuxsuren.github.io/v1alpha1"
 	"al-cloud/pkg/controllers/core"
 	"context"
 	"encoding/base64"
@@ -33,7 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
-	"github.com/linuxsuren/kde/api/v1alpha1"
+	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"

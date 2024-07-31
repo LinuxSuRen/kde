@@ -96,6 +96,7 @@ func (s *Server) GetDevSpace(c *gin.Context) {
 	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Get(c.Request.Context(), name, metav1.GetOptions{})
 	if err != nil {
 		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
 	} else {
 		c.JSON(http.StatusOK, result)
 	}

@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	linuxsurengithubiov1alpha1 "github.com/linuxsuren/kde/api/v1alpha1"
+	linuxsurengithubiov1alpha1 "github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 )
 
 // UserReconciler reconciles a User object

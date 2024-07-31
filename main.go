@@ -18,6 +18,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
@@ -31,12 +32,10 @@ func main() {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		panic(err.Error())
-	}
-
-	config, err = clientcmd.BuildConfigFromFlags("", "/home/workspace/.kube/config")
-	if err != nil {
-		panic(err.Error())
+		config, err = clientcmd.BuildConfigFromFlags("", os.ExpandEnv("$HOME/.kube/config"))
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 
 	// creates the clientset

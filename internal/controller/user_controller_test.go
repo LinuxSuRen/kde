@@ -27,7 +27,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	linuxsurengithubiov1alpha1 "github.com/linuxsuren/kde/api/v1alpha1"
+	linuxsurengithubiov1alpha1 "github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 )
 
 var _ = Describe("User Controller", func() {
