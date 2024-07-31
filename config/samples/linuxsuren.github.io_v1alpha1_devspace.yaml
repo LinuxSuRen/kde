@@ -5,5 +5,6 @@ metadata:
     app.kubernetes.io/name: kde
     app.kubernetes.io/managed-by: kustomize
   name: devspace-sample
-spec:
-  # TODO(user): Add fields here
+status:
+  phase: Ready
+  link: https://kde.linuxsuren.io
