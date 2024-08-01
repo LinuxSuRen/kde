@@ -23,6 +23,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
 	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -44,12 +45,20 @@ func main() {
 		panic(err.Error())
 	}
 
+	var dyClient dynamic.Interface
+	if dyClient, err = dynamic.NewForConfig(config); err != nil {
+		panic(err.Error())
+	}
+
 	var kClient *kdeClient.Clientset
-	kClient, err = kdeClient.NewForConfig(config)
+	if kClient, err = kdeClient.NewForConfig(config); err != nil {
+		panic(err.Error())
+	}
 
 	server := &apiserver.Server{
 		Client:  clientset,
 		KClient: kClient,
+		DClient: dyClient,
 	}
 
 	r := gin.Default()
@@ -63,5 +72,6 @@ func main() {
 	r.DELETE("/devspace/:devspace", server.DeleteDevSpace)
 	r.PUT("/devspace/:devspace", server.UpdateDevSpace)
 	r.GET("/devspace/:devspace", server.GetDevSpace)
+	r.GET("/install", server.Install)
 	r.Run()
 }

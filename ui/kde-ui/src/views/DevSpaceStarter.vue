@@ -19,11 +19,7 @@ const loading = async () => {
         phase.value = res?.status?.phase
         link.value = res?.status?.link
 
-        if (res?.ErrStatus?.code === 404) {
-           devSpaceCreationVisible.value = true
-        } else {
-           devSpaceCreationVisible.value = false
-        }
+        devSpaceCreationVisible.value = res?.ErrStatus?.code === 404
     }).catch(err => {
         console.log(err)
     })

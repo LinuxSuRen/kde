@@ -22,14 +22,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
+	"github.com/linuxsuren/kde/config"
 	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 )
 
 type Server struct {
 	Client  *kubernetes.Clientset
 	KClient *kdeClient.Clientset
+	DClient dynamic.Interface
 }
 
 func (s *Server) CreateDevSpace(c *gin.Context) {
@@ -99,5 +103,19 @@ func (s *Server) GetDevSpace(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 	} else {
 		c.JSON(http.StatusOK, result)
+	}
+}
+
+func (s *Server) Install(c *gin.Context) {
+	name := c.Query("name")
+	v, err := config.GetFile(name)
+
+	s.DClient.Resource(schema.GroupVersionResource{}).Create(c.Request.Context(), nil, metav1.CreateOptions{})
+
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
+	} else {
+		c.JSON(http.StatusOK, string(v))
 	}
 }

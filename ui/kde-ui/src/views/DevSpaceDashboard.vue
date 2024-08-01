@@ -27,11 +27,11 @@ import { ref } from 'vue'
 
 interface User {
     status: {
-      phase: string
-      link: string
+        phase: string
+        link: string
     }
 }
-  
+
   const tableRowClassName = ({
     row,
     rowIndex,
@@ -48,24 +48,23 @@ interface User {
   }
   
 const tableData = ref([])
-
 const loadData = () => {
-  fetch('/api/devspace', {
-      method: 'GET'
-  }).then(res => {
-      return res.json()
-  }).then(d => {
-      tableData.value = d.items
-  })
+    fetch('/api/devspace', {
+        method: 'GET'
+    }).then(res => {
+        return res.json()
+    }).then(d => {
+        tableData.value = d.items
+    })
 }
 loadData()
 
 const deleteRow = (index: number) => {
-  fetch(`/api/devspace/${tableData.value[index].metadata.name}`, {
-    method: 'DELETE'
-  }).finally(() => {
-    loadData()
-  })
+    fetch(`/api/devspace/${tableData.value[index].metadata.name}`, {
+        method: 'DELETE'
+    }).finally(() => {
+        loadData()
+    })
 }
 </script>
   
@@ -77,4 +76,3 @@ const deleteRow = (index: number) => {
 --el-table-tr-bg-color: var(--el-color-success-light-9);
 }
 </style>
-  
