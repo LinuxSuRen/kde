@@ -21,7 +21,9 @@ metadata:
       name: {{.ObjectMeta.Name}}
       uid: {{.ObjectMeta.UID}}
 spec:
-  # ingressClassName: nginx
+  {{if ne .ObjectMeta.Annotations.ingressMode "path"}}
+  ingressClassName: nginx
+  {{end}}
   rules:
     - http:
         paths:

@@ -15,14 +15,16 @@ const createDevSpace = async (name: string) =>  {
             "metadata": {
               "name": "${name}",
               "annotations": {
-                "storageTemporary": "a",
-                "ingressMode": "path"
+                "storageTemporary1": "a",
+                "ingressMode": "path1",
+                "volumeMode": "Filesystem",
+                "storageClassName": "rook-cephfs"
               }
             },
             "spec": {
               "cpu": "100m",
               "memory": "100Mi",
-              "host": "kubernetes.docker.internal"
+              "host": "dev-center.jenkins-zh.cn"
             }
             }`
     }).then(res => {
@@ -41,8 +43,8 @@ const loading = async () => {
     }).then(res => {
         return res.json()
     }).then(res => {
-        phase.value = res?.Status?.Phase
-        link.value = res?.Status?.Link
+        phase.value = res?.status?.phase
+        link.value = res?.status?.link
 
         if (res?.ErrStatus?.code === 404) {
            createDevSpace(name)
@@ -58,7 +60,7 @@ setInterval(() => {
 
 watch(phase, (p) => {
     if (p === 'Ready') {
-        window.location.href = '/'
+        window.location.href = `http://${link.value}`
     }
 })
 </script>

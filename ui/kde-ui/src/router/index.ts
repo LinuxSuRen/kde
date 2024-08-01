@@ -21,6 +21,11 @@ const router = createRouter({
       path: '/dev',
       name: 'dev',
       component: () => import('../views/DevSpaceStarter.vue')
+    },
+    {
+      path: '/dashboard',
+      name: 'devdashboard',
+      component: () => import('../views/DevSpaceDashboard.vue')
     }
   ]
 })
