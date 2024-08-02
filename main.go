@@ -23,6 +23,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
 	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
+	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -55,10 +56,16 @@ func main() {
 		panic(err.Error())
 	}
 
+	var extClient *apiextensionsclientset.Clientset
+	if extClient, err = apiextensionsclientset.NewForConfig(config); err != nil {
+		panic(err.Error())
+	}
+
 	server := &apiserver.Server{
 		Client:  clientset,
 		KClient: kClient,
 		DClient: dyClient,
+		ExtClient: extClient,
 	}
 
 	r := gin.Default()
@@ -73,5 +80,7 @@ func main() {
 	r.PUT("/devspace/:devspace", server.UpdateDevSpace)
 	r.GET("/devspace/:devspace", server.GetDevSpace)
 	r.GET("/install", server.Install)
+	r.GET("/instanceStatus", server.InstanceStatus)
+	r.GET("/namespaces", server.Namespaces)
 	r.Run()
 }
