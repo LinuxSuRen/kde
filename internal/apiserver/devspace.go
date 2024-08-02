@@ -17,8 +17,10 @@ limitations under the License.
 package apiserver
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
@@ -112,7 +114,7 @@ func (s *Server) GetDevSpace(c *gin.Context) {
 func (s *Server) Install(c *gin.Context) {
 	ctx := c.Request.Context()
 	namespace := c.DefaultQuery("namespace", "default")
-	deploy := getDeployment()
+	deploy := getDeployment("manager.yaml")
 
 	_, err := s.Client.AppsV1().Deployments(namespace).Create(ctx, deploy, metav1.CreateOptions{})
 
@@ -124,9 +126,9 @@ func (s *Server) Install(c *gin.Context) {
 	}
 }
 
-func getDeployment() *appsv1.Deployment {
+func getDeployment(name string) *appsv1.Deployment {
 	var err error
-	data, _ := config.GetFile("manager/manager.yaml")
+	data, _ := config.GetFile(filepath.Join("manager", name))
 
 	deploy := &appsv1.Deployment{}
 	if data, err = yaml.ToJSON(data); err == nil {
@@ -145,34 +147,74 @@ func (s *Server) InstanceStatus(c *gin.Context) {
 	ctx := c.Request.Context()
 	namespace := c.DefaultQuery("namespace", "default")
 	instanceStatus := []InstanceStatus{}
-
-	_, err := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Get(ctx, "devspaces.linuxsuren.github.io", metav1.GetOptions{})
-	if err == nil {
-		instanceStatus = append(instanceStatus, InstanceStatus{
-			Component: "crd",
-			Status:    "installed",
-		})
-	} else {
-		instanceStatus = append(instanceStatus, InstanceStatus{
-			Component: "crd",
-			Status:    "not installed",
-		})
-	}
-
-	controllerDeploy := getDeployment()
-	if controllerDeploy, err = s.Client.AppsV1().Deployments(namespace).Get(ctx, controllerDeploy.Name, metav1.GetOptions{}); err == nil {
-		instanceStatus = append(instanceStatus, InstanceStatus{
-			Component: "controller",
-			Status:    controllerDeploy.Status.String(),
-		})
-	} else {
-		instanceStatus = append(instanceStatus, InstanceStatus{
-			Component: "controller",
-			Status:    "not installed",
-		})
-	}
+	instanceStatus = append(instanceStatus,
+		s.getCRDStatus(ctx, "devspaces.linuxsuren.github.io"),
+		s.getCRDStatus(ctx, "users.linuxsuren.github.io"),
+		s.getDeploymentStatus(ctx, namespace, "manager"),
+		s.getDeploymentStatus(ctx, namespace, "apiserver-deploy"),
+		s.getServiceStatus(ctx, namespace, "apiserver-service"),
+		s.getConfigmapStatus(ctx, namespace, "config"),
+	)
 
 	c.JSON(http.StatusOK, instanceStatus)
+}
+
+func (s *Server) getCRDStatus(ctx context.Context, name string) InstanceStatus {
+	_, err := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Get(ctx, name, metav1.GetOptions{})
+	if err == nil {
+		return InstanceStatus{
+			Component: name,
+			Status:    "installed",
+		}
+	} else {
+		return InstanceStatus{
+			Component: name,
+			Status:    "not installed",
+		}
+	}
+}
+
+func (s *Server) getDeploymentStatus(ctx context.Context, namespace, name string) InstanceStatus {
+	controllerDeploy := getDeployment(name + ".yaml")
+	if _, err := s.Client.AppsV1().Deployments(namespace).Get(ctx, controllerDeploy.Name, metav1.GetOptions{}); err == nil {
+		return InstanceStatus{
+			Component: name,
+			Status:    "installed",
+		}
+	} else {
+		return InstanceStatus{
+			Component: name,
+			Status:    "not installed",
+		}
+	}
+}
+
+func (s *Server) getServiceStatus(ctx context.Context, namespace, name string) InstanceStatus {
+	if _, err := s.Client.CoreV1().Services(namespace).Get(ctx, name, metav1.GetOptions{}); err == nil {
+		return InstanceStatus{
+			Component: name,
+			Status:    "installed",
+		}
+	} else {
+		return InstanceStatus{
+			Component: name,
+			Status:    "not installed",
+		}
+	}
+}
+
+func (s *Server) getConfigmapStatus(ctx context.Context, namespace, name string) InstanceStatus {
+	if _, err := s.Client.CoreV1().ConfigMaps(namespace).Get(ctx, name, metav1.GetOptions{}); err == nil {
+		return InstanceStatus{
+			Component: name,
+			Status:    "installed",
+		}
+	} else {
+		return InstanceStatus{
+			Component: name,
+			Status:    "not installed",
+		}
+	}
 }
 
 func (s *Server) Namespaces(c *gin.Context) {

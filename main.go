@@ -62,9 +62,9 @@ func main() {
 	}
 
 	server := &apiserver.Server{
-		Client:  clientset,
-		KClient: kClient,
-		DClient: dyClient,
+		Client:    clientset,
+		KClient:   kClient,
+		DClient:   dyClient,
 		ExtClient: extClient,
 	}
 
@@ -82,5 +82,15 @@ func main() {
 	r.GET("/install", server.Install)
 	r.GET("/instanceStatus", server.InstanceStatus)
 	r.GET("/namespaces", server.Namespaces)
+	r.GET("/healthz", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "ok",
+		})
+	})
+	r.GET("/readyz", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "ok",
+		})
+	})
 	r.Run()
 }

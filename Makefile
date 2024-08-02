@@ -1,5 +1,6 @@
 # Image URL to use all building/pushing image targets
-IMG ?= ghcr.io/linuxsuren/kde/controller:latest
+IMG ?= ghcr.io/linuxsuren/kde:latest
+
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.30.0
 GV="linuxsuren.github.io:v1alpha1"
@@ -92,7 +93,7 @@ run: manifests generate fmt vet ## Run a controller from your host.
 # More info: https://docs.docker.com/develop/develop-images/build_enhancements/
 .PHONY: docker-build
 docker-build: ## Build docker image with the manager.
-	$(CONTAINER_TOOL) build -t ${IMG} .
+	$(CONTAINER_TOOL) build -t ${IMG} . --build-arg GOPROXY=https://goproxy.cn,direct
 
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.

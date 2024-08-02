@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiserver
+  namespace: system
+  labels:
+    control-plane: apiserver
+    app.kubernetes.io/name: kde
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  selector:
+    matchLabels:
+      control-plane: apiserver
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: server
+      labels:
+        control-plane: apiserver
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+      - command:
+        - /server
+        image: ghcr.io/linuxsuren/kde:latest
+        name: server
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - "ALL"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+      serviceAccountName: apiserver
+      terminationGracePeriodSeconds: 10
