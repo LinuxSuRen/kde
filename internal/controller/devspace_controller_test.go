@@ -17,8 +17,6 @@ limitations under the License.
 package controller
 
 import (
-	ailinkiov1 "al-cloud/pkg/api/linuxsuren.github.io/v1alpha1"
-	"al-cloud/pkg/controllers/core"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -26,6 +24,9 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	ailinkiov1 "github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
+	"github.com/linuxsuren/kde/pkg/controllers/core"
 
 	networkv1 "k8s.io/api/networking/v1"
 

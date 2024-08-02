@@ -17,10 +17,11 @@ limitations under the License.
 package controller
 
 import (
-	ailinkiov1 "al-cloud/pkg/api/linuxsuren.github.io/v1alpha1"
-	"al-cloud/pkg/controllers/core"
 	"context"
 	"testing"
+
+	"github.com/linuxsuren/kde/pkg/controllers/core"
+	ailinkiov1 "github.com/linuxsuren/pkg/api/linuxsuren.github.io/v1alpha1"
 
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 	"github.com/stretchr/testify/assert"

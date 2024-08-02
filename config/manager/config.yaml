@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  sever: http://example.com
+kind: ConfigMap
+metadata:
+  name: config
+  namespace: default
