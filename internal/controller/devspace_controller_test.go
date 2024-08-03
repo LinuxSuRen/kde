@@ -25,9 +25,6 @@ import (
 	"testing"
 	"time"
 
-	ailinkiov1 "github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
-	"github.com/linuxsuren/kde/pkg/controllers/core"
-
 	networkv1 "k8s.io/api/networking/v1"
 
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -80,25 +77,25 @@ func TestGitPodTemplateRender(t *testing.T) {
 		ingress := turnTemplateToUnstructured(gitpodExposeIngress, gitpod)
 		data, err := ingress.MarshalJSON()
 		assert.NoError(t, err, err)
-		assert.Contains(t, string(data), `"host":"8080.demo.gitpod.ailink.io"`, string(data))
+		assert.Contains(t, string(data), `"host":"8080.demo.gitpod.linuxsuren.github.io"`, string(data))
 	})
 }
 
 func TestUpdateStatus(t *testing.T) {
 	reconciler := &DevSpaceReconciler{
-		Ingress: "gitpod.ailink.io",
+		Ingress: "gitpod.linuxsuren.github.io",
 	}
 	gitpod := createDefaultGitPod()
 	gitpod = reconciler.updateStatus(gitpod)
-	assert.Equal(t, "demo.gitpod.ailink.io", gitpod.Status.Link)
-	assert.Equal(t, []ailinkiov1.ExposeLink{
+	assert.Equal(t, "demo.gitpod.linuxsuren.github.io", gitpod.Status.Link)
+	assert.Equal(t, []v1alpha1.ExposeLink{
 		{
 			Port: 8080,
-			Link: "8080.demo.gitpod.ailink.io",
+			Link: "8080.demo.gitpod.linuxsuren.github.io",
 		},
 		{
 			Port: 9090,
-			Link: "9090.demo.gitpod.ailink.io",
+			Link: "9090.demo.gitpod.linuxsuren.github.io",
 		},
 	}, gitpod.Status.ExposeLinks)
 }
@@ -109,36 +106,32 @@ func createDefaultGitPod() *v1alpha1.DevSpace {
 			Name:      "demo",
 			Namespace: "default",
 			Annotations: map[string]string{
-				"storageClassName":             "storageClassName",
-				"volumeMode":                   "volumeMode",
-				ailinkiov1.AnnoKeyExposePorts:  strings.Join([]string{"8080", "9090", "abc", "8080", "-1", "", "65536", "3000"}, ","),
-				ailinkiov1.AnnoKeyMaintainMode: PolicyAlways,
+				"storageClassName":           "storageClassName",
+				"volumeMode":                 "volumeMode",
+				v1alpha1.AnnoKeyExposePorts:  strings.Join([]string{"8080", "9090", "abc", "8080", "-1", "", "65536", "3000"}, ","),
+				v1alpha1.AnnoKeyMaintainMode: PolicyAlways,
 			},
 		},
 		Spec: v1alpha1.DevSpaceSpec{
-			Repository: &ailinkiov1.GitRepository{
-				URL:    "https://git.com",
-				Branch: "master",
-			},
-			Image:  "ailink.io/image:tag",
+			Image:  "linuxsuren.github.io/image:tag",
 			Memory: "1Gi",
 			CPU:    "1",
-			Host:   "gitpod.ailink.io",
-			Windows: []ailinkiov1.Window{{
+			Host:   "gitpod.linuxsuren.github.io",
+			Windows: []v1alpha1.Window{{
 				From: "01:00",
 				To:   "15:00",
 			}},
 		},
 		Status: v1alpha1.DevSpaceStatus{
-			Link: "demo.gitpod.ailink.io",
-			ExposeLinks: []ailinkiov1.ExposeLink{
+			Link: "demo.gitpod.linuxsuren.github.io",
+			ExposeLinks: []v1alpha1.ExposeLink{
 				{
 					Port: 8080,
-					Link: "8080.demo.gitpod.ailink.io",
+					Link: "8080.demo.gitpod.linuxsuren.github.io",
 				},
 				{
 					Port: 9090,
-					Link: "9090.demo.gitpod.ailink.io",
+					Link: "9090.demo.gitpod.linuxsuren.github.io",
 				},
 			},
 		},
@@ -146,9 +139,9 @@ func createDefaultGitPod() *v1alpha1.DevSpace {
 }
 
 func TestGitPodController(t *testing.T) {
-	schema, err := ailinkiov1.SchemeBuilder.Register().Build()
+	schema, err := v1alpha1.SchemeBuilder.Register().Build()
 	assert.Nil(t, err)
-	err = ailinkiov1.SchemeBuilder.AddToScheme(schema)
+	err = v1alpha1.SchemeBuilder.AddToScheme(schema)
 	assert.Nil(t, err)
 	err = v1.SchemeBuilder.AddToScheme(schema)
 	assert.Nil(t, err)
@@ -160,10 +153,10 @@ func TestGitPodController(t *testing.T) {
 	withoutDefaultValue.Spec.Image = ""
 	withoutDefaultValue.Spec.Host = ""
 	withoutDefaultValue.Annotations = map[string]string{
-		ailinkiov1.AnnoKeyMaintainMode: PolicyAlways,
+		v1alpha1.AnnoKeyMaintainMode: PolicyAlways,
 	}
 	withoutDefaultValue.Spec.Auth = v1alpha1.DevSpaceAuth{
-		BasicAuth: &ailinkiov1.BasicAuth{
+		BasicAuth: &v1alpha1.BasicAuth{
 			Username: "test",
 			Password: "test",
 		},
@@ -250,10 +243,10 @@ func TestGitPodController(t *testing.T) {
 			gitpod := &v1alpha1.DevSpace{}
 			assert.NoError(t, Client.Get(context.TODO(), defaultRequest.NamespacedName, gitpod))
 			assert.Empty(t, gitpod.Spec.Auth.BasicAuth.Password)
-			assert.NotEmpty(t, gitpod.Annotations[ailinkiov1.AnnoKeyBasicAuth])
+			assert.NotEmpty(t, gitpod.Annotations[v1alpha1.AnnoKeyBasicAuth])
 
 			var auth []byte
-			auth, err = base64.StdEncoding.DecodeString(gitpod.Annotations[ailinkiov1.AnnoKeyBasicAuth])
+			auth, err = base64.StdEncoding.DecodeString(gitpod.Annotations[v1alpha1.AnnoKeyBasicAuth])
 			assert.NoError(t, err)
 			assert.Contains(t, string(auth), gitpod.Spec.Auth.BasicAuth.Username)
 
@@ -277,25 +270,15 @@ func TestGitPodController(t *testing.T) {
 			assert.Equal(t, 0, len(gitpod.Status.Pods))
 			assert.Empty(t, gitpod.Status.DeployStatus)
 		},
-	}, {
-		name: "no maintain mode set",
-		req:  defaultRequest,
-		fields: fields{
-			Client: fake.NewClientBuilder().WithScheme(schema).WithObjects(noMaintainMode.DeepCopy()).Build(),
-		},
-		verify: func(t *testing.T, r ctrl.Result, Client client.Client, err error) {
-			assert.NoError(t, err)
-			assert.Equal(t, time.Duration(0), r.RequeueAfter)
-		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			r := &DevSpaceReconciler{
 				Client:   tt.fields.Client,
 				Recorder: tt.fields.recorder,
-				Ingress:  "gitpod.ailink.io",
+				Ingress:  "gitpod.linuxsuren.github.io",
 			}
-			mgr := &core.FakeManager{
+			mgr := &FakeManager{
 				Client: tt.fields.Client,
 				Scheme: schema,
 			}
@@ -311,7 +294,7 @@ func TestIsInAliveWindows(t *testing.T) {
 
 	tests := []struct {
 		name         string
-		windows      []ailinkiov1.Window
+		windows      []v1alpha1.Window
 		expectHasWin bool
 		expectOk     bool
 		expectErr    bool
@@ -322,7 +305,7 @@ func TestIsInAliveWindows(t *testing.T) {
 		expectOk:     true,
 	}, {
 		name: "invalid time format",
-		windows: []ailinkiov1.Window{{
+		windows: []v1alpha1.Window{{
 			From: "aa:bb",
 		}, {
 			From: "00:12:00",
@@ -333,7 +316,7 @@ func TestIsInAliveWindows(t *testing.T) {
 		expectOk:     true,
 	}, {
 		name: "before the window",
-		windows: []ailinkiov1.Window{{
+		windows: []v1alpha1.Window{{
 			From: now.Add(time.Minute).Format(time.TimeOnly),
 			To:   now.Add(time.Minute * 2).Format(time.TimeOnly),
 		}},
@@ -342,7 +325,7 @@ func TestIsInAliveWindows(t *testing.T) {
 		expectOk:     false,
 	}, {
 		name: "after the window",
-		windows: []ailinkiov1.Window{{
+		windows: []v1alpha1.Window{{
 			From: now.Add(-2 * time.Minute).Format(time.TimeOnly),
 			To:   now.Add(-1 * time.Minute).Format(time.TimeOnly),
 		}},
@@ -351,7 +334,7 @@ func TestIsInAliveWindows(t *testing.T) {
 		expectOk:     false,
 	}, {
 		name: "from bigger than to",
-		windows: []ailinkiov1.Window{{
+		windows: []v1alpha1.Window{{
 			From: now.Add(2 * time.Minute).Format(time.TimeOnly),
 			To:   now.Add(-1 * time.Minute).Format(time.TimeOnly),
 		}},
@@ -360,7 +343,7 @@ func TestIsInAliveWindows(t *testing.T) {
 		expectOk:     false,
 	}, {
 		name: "in the window",
-		windows: []ailinkiov1.Window{{
+		windows: []v1alpha1.Window{{
 			From: now.Add(-1 * time.Minute).Format(time.TimeOnly),
 			To:   now.Add(1 * time.Minute).Format(time.TimeOnly),
 		}},

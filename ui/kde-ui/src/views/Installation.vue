@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import {ref, reactive, h, watch} from 'vue'
+import { ElNotification } from 'element-plus'
 
 const active = ref('Install')
 
-const instanceStatusData = ref()
-fetch('/api/instanceStatus', {
-    method: 'GET'
-}).then(res => res.json()).then(d => {
-    instanceStatusData.value = d
+const installForm = reactive({
+    namespace: '',
 })
+
+const instanceStatusData = ref()
+const loadInstanceStatusData = () => {
+    fetch(`/api/instanceStatus?namespace=${installForm.namespace}`, {
+        method: 'GET'
+    }).then(res => res.json()).then(d => {
+        instanceStatusData.value = d
+    })
+}
+loadInstanceStatusData()
 
 const namespaceList = ref({
     items: [{
@@ -23,9 +31,45 @@ fetch('/api/namespaces', {
     namespaceList.value = d
 })
 
-const installForm = reactive({
-  namespace: '',
-})
+watch(() => installForm.namespace, loadInstanceStatusData)
+
+const install = () => {
+    fetch(`/api/install?namespace=${installForm.namespace}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(res => {
+        if (res.status === 200) {
+            ElNotification({
+                title: 'Installation successful',
+                type: 'success',
+            })
+        } else {
+            ElNotification({
+                title: 'Installation failed',
+                type: 'error',
+            })
+        }
+    }).finally(loadInstanceStatusData)
+}
+const uninstall = () => {
+    fetch(`/api/uninstall?namespace=${installForm.namespace}`, {
+        method: 'DELETE',
+    }).then(res => {
+        if (res.status === 200) {
+            ElNotification({
+                title: 'Uninstallation successful',
+                type: 'success',
+            })
+        } else {
+            ElNotification({
+                title: 'Uninstallation failed',
+                type: 'error',
+            })
+        }
+    }).finally(loadInstanceStatusData)
+}
 </script>
 
 <template>
@@ -60,14 +104,16 @@ const installForm = reactive({
                 <div>
                     <div>Instance status:</div>
                     <el-table :data="instanceStatusData" style="width: 100%">
-                        <el-table-column prop="component" label="Component" />
-                        <el-table-column prop="status" label="status" width="180" />
+                        <el-table-column prop="component" label="Component" width="150" />
+                        <el-table-column prop="name" label="Name" />
+                        <el-table-column prop="status" label="status" width="150" />
                     </el-table>
                 </div>
 
                 <div>
-                    <el-button type="primary">Install</el-button>
-                    <el-button type="primary">Next</el-button>
+                    <el-button type="primary" @click="install">Install</el-button>
+                    <el-button type="danger" @click="uninstall">Uninstall</el-button>
+                    <el-button type="primary" @click="active='Configuration'">Next</el-button>
                 </div>
             </el-tab-pane>
             <el-tab-pane name="Configuration">

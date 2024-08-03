@@ -50,5 +50,5 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
-      serviceAccountName: apiserver
+      serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10

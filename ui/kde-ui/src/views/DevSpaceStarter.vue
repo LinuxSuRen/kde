@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
 import DevSpaceCreation from '../components/dialog/DevSpaceCreation.vue'
 
-const route = useRoute()
-const phase = ref('')
-const link = ref('')
+interface DevSpace {
+    status: {
+        phase: string
+        deployStatus: string
+        link: string
+    }
+}
+
+const devSpace = ref({} as DevSpace)
 const devSpaceCreationVisible = ref(false)
 
 const loading = async () => {
@@ -16,9 +21,7 @@ const loading = async () => {
     }).then(res => {
         return res.json()
     }).then(res => {
-        phase.value = res?.status?.phase
-        link.value = res?.status?.link
-
+        devSpace.value = res
         devSpaceCreationVisible.value = res?.ErrStatus?.code === 404
     }).catch(err => {
         console.log(err)
@@ -29,18 +32,18 @@ setInterval(() => {
     loading()
 }, 1000)
 
-watch(phase, (p) => {
+watch(() => devSpace.value?.status?.deployStatus, (p) => {
     if (p === 'Ready') {
-        window.location.href = `http://${link.value}`
+        window.location.href = `http://${devSpace.value?.status?.link}`
     }
 })
 </script>
 
 <template>
-  <div class="about">
-    <h1>This is an about page{{ route.query.id }} - {{  route.hash }}</h1>
-    <h2>{{ phase }}</h2>
-  </div>
+    <div class="about">
+        <h2>Request Status: {{ devSpace.status?.phase }}</h2>
+        <h2>Env Status: {{ devSpace.status?.deployStatus }}</h2>
+    </div>
 
-  <DevSpaceCreation :visible="devSpaceCreationVisible" />
+    <DevSpaceCreation :visible="devSpaceCreationVisible"/>
 </template>

@@ -79,7 +79,8 @@ func main() {
 	r.DELETE("/devspace/:devspace", server.DeleteDevSpace)
 	r.PUT("/devspace/:devspace", server.UpdateDevSpace)
 	r.GET("/devspace/:devspace", server.GetDevSpace)
-	r.GET("/install", server.Install)
+	r.POST("/install", server.Install)
+	r.DELETE("/uninstall", server.Uninstall)
 	r.GET("/instanceStatus", server.InstanceStatus)
 	r.GET("/namespaces", server.Namespaces)
 	r.GET("/healthz", func(c *gin.Context) {

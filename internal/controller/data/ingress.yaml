@@ -2,14 +2,14 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
-    ailink.io/application: {{.ObjectMeta.Name}}
-    ailink.io/application_kind: gitpod
+    linuxsuren.github.io/application: {{.ObjectMeta.Name}}
+    linuxsuren.github.io/application_kind: gitpod
   annotations:
     {{ if .Spec.Auth.BasicAuth }}
     nginx.ingress.kubernetes.io/auth-secret: {{.ObjectMeta.Name}}
     nginx.ingress.kubernetes.io/auth-type: basic
     {{ else }}
-    ailink.io/auth-type: none
+    linuxsuren.github.io/auth-type: none
     {{ end }}
   name: {{.ObjectMeta.Name}}
   namespace: {{.ObjectMeta.Namespace}}

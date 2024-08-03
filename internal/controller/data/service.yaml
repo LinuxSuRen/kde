@@ -23,6 +23,6 @@ spec:
       targetPort: {{.Port}}
     {{ end }}
   selector:
-    ailink.io/application: {{.ObjectMeta.Name}}
-    ailink.io/application_kind: gitpod
+    linuxsuren.github.io/application: {{.ObjectMeta.Name}}
+    linuxsuren.github.io/application_kind: gitpod
   type: ClusterIP

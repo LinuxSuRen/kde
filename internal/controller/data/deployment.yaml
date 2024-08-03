@@ -2,8 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    ailink.io/application_kind: gitpod
-    ailink.io/application: {{.ObjectMeta.Name}}
+    linuxsuren.github.io/application_kind: gitpod
+    linuxsuren.github.io/application: {{.ObjectMeta.Name}}
   name: {{.ObjectMeta.Name}}
   namespace: {{.ObjectMeta.Namespace}}
   ownerReferences:
@@ -21,8 +21,8 @@ spec:
   {{ end }}
   selector:
     matchLabels:
-      ailink.io/application_kind: gitpod
-      ailink.io/application: {{.ObjectMeta.Name}}
+      linuxsuren.github.io/application_kind: gitpod
+      linuxsuren.github.io/application: {{.ObjectMeta.Name}}
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -31,8 +31,8 @@ spec:
   template:
     metadata:
       labels:
-        ailink.io/application_kind: gitpod
-        ailink.io/application: {{.ObjectMeta.Name}}
+        linuxsuren.github.io/application_kind: gitpod
+        linuxsuren.github.io/application: {{.ObjectMeta.Name}}
     spec:
       affinity:
         podAntiAffinity:
@@ -40,13 +40,13 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  ailink.io/application_kind: gitpod
-                  ailink.io/application: {{.ObjectMeta.Name}}
+                  linuxsuren.github.io/application_kind: gitpod
+                  linuxsuren.github.io/application: {{.ObjectMeta.Name}}
               topologyKey: kubernetes.io/hostname
             weight: 5
       initContainers:
         - image: {{.Spec.Image}}
-          imagePullPolicy: {{index .ObjectMeta.Annotations "devops.ailink.io/image-pull-policy"}}
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: init
           command:
             - /bin/bash
@@ -99,7 +99,7 @@ spec:
             privileged: true
       containers:
         - image: {{.Spec.Image}}
-          imagePullPolicy: {{index .ObjectMeta.Annotations "devops.ailink.io/image-pull-policy"}}
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: server
           env:
             - name: GITPOD_VERSION
@@ -148,7 +148,7 @@ spec:
             - mountPath: /var/run
               name: container-runtime
         - image: ghcr.io/linuxsuren/library/docker:27.0.3-dind
-          imagePullPolicy: {{index .ObjectMeta.Annotations "devops.ailink.io/image-pull-policy"}}
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: docker
           resources:
             requests:

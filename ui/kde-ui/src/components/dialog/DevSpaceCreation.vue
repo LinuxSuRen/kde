@@ -1,6 +1,6 @@
 // This is a dialog for devspace creation
 <script setup lang="ts">
-import { ref, reactive, watch, defineProps } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 
 const props = defineProps({
@@ -15,6 +15,15 @@ interface DevLanguage {
 const devLanguages = ref([{
   name: 'golang',
   image: 'ghcr.io/linuxsuren/openvscode-server-golang:v0.0.8'
+}, {
+    name: 'nodejs',
+    image: 'ghcr.io/linuxsuren/openvscode-server-nodejs:v0.0.8'
+}, {
+    name: 'java',
+    image: 'ghcr.io/linuxsuren/openvscode-server-java:v0.0.8'
+}, {
+    name: 'full',
+    image: 'ghcr.io/linuxsuren/openvscode-server-full:v0.0.8'
 }])
 
 interface DevSpace {
@@ -46,9 +55,6 @@ const createDevSpace = async (devSpace: DevSpace) =>  {
             }`
     }).then(res => {
         return res.json()
-    }).then(res => {
-        phase.value = res?.Status?.Phase
-        link.value
     })
 }
 

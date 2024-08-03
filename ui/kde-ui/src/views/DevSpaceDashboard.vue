@@ -4,9 +4,9 @@
       style="width: 100%"
       :row-class-name="tableRowClassName"
     >
-      <el-table-column prop="metadata.name" label="Name" width="180" />
+      <el-table-column prop="metadata.name" label="Name" width="100" />
       <el-table-column prop="status.link" label="Address" />
-      <el-table-column prop="status.phase" label="Status" width="180" />
+      <el-table-column prop="status.phase" label="Status" width="80" />
       <el-table-column fixed="right" label="Operations" min-width="80">
         <template #default="scope">
           <el-button
@@ -47,7 +47,11 @@ interface User {
     return ''
   }
   
-const tableData = ref([])
+const tableData = ref([{
+  metadata: {
+    name: 'sample'
+  }
+}])
 const loadData = () => {
     fetch('/api/devspace', {
         method: 'GET'

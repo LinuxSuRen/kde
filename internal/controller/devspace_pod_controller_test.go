@@ -20,9 +20,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/linuxsuren/kde/pkg/controllers/core"
-	ailinkiov1 "github.com/linuxsuren/pkg/api/linuxsuren.github.io/v1alpha1"
-
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	appsv1 "k8s.io/api/apps/v1"
@@ -94,7 +91,7 @@ func TestGitPodPodController(t *testing.T) {
 		verify: func(t *testing.T, r ctrl.Result, Client client.Client, err error) {
 			assert.NoError(t, err, err)
 
-			gitpod := &ailinkiov1.GitPod{}
+			gitpod := &v1alpha1.DevSpace{}
 			err = Client.Get(context.TODO(), defaultRequest.NamespacedName, gitpod)
 			assert.NoError(t, err, err)
 			assert.Equal(t, string(v1.PodRunning), gitpod.Status.DeployStatus)
@@ -108,7 +105,7 @@ func TestGitPodPodController(t *testing.T) {
 		verify: func(t *testing.T, r ctrl.Result, Client client.Client, err error) {
 			assert.NoError(t, err, err)
 
-			gitpod := &ailinkiov1.GitPod{}
+			gitpod := &v1alpha1.DevSpace{}
 			err = Client.Get(context.TODO(), defaultRequest.NamespacedName, gitpod)
 			assert.NoError(t, err, err)
 			assert.Equal(t, string(v1.PodPending), gitpod.Status.DeployStatus)
@@ -119,7 +116,7 @@ func TestGitPodPodController(t *testing.T) {
 			r := &DevSpacePodPodReconciler{
 				Client: tt.fields.Client,
 			}
-			mgr := &core.FakeManager{
+			mgr := &FakeManager{
 				Client: tt.fields.Client,
 				Scheme: schema,
 			}

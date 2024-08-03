@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apiserver
+  namespace: system
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: apiserver
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+      host: example.com

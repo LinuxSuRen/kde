@@ -127,7 +127,7 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 
 func setDefaultValueForGitPod(gitpod *v1alpha1.DevSpace, ingress string) {
 	if gitpod.Spec.Image == "" {
-		gitpod.Spec.Image = "ghcr.io/linuxsuren/openvscode-server-golang:v0.0.8"
+		gitpod.Spec.Image = "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
 	}
 	if gitpod.Spec.Host == "" {
 		gitpod.Spec.Host = ingress

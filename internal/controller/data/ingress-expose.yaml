@@ -3,8 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   labels:
-    ailink.io/application: {{.ObjectMeta.Name}}
-    ailink.io/application_kind: gitpod
+    linuxsuren.github.io/application: {{.ObjectMeta.Name}}
+    linuxsuren.github.io/application_kind: gitpod
   name: {{.ObjectMeta.Name}}-expose
   namespace: {{.ObjectMeta.Namespace}}
   ownerReferences:
