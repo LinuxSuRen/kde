@@ -30,7 +30,7 @@ const loading = async () => {
 
 setInterval(() => {
     loading()
-}, 1000)
+}, 2000)
 
 watch(() => devSpace.value?.status?.deployStatus, (p) => {
     if (p === 'Ready') {

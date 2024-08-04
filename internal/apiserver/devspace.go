@@ -25,6 +25,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
+	"github.com/linuxsuren/kde/pkg/core"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
@@ -36,6 +37,8 @@ type Server struct {
 	KClient   *kdeClient.Clientset
 	DClient   dynamic.Interface
 	ExtClient *apiextensionsclientset.Clientset
+
+	Config *core.Config
 }
 
 func (s *Server) CreateDevSpace(c *gin.Context) {
@@ -49,6 +52,8 @@ func (s *Server) CreateDevSpace(c *gin.Context) {
 	if err := c.BindJSON(devSpace); err != nil {
 		c.Error(err)
 	} else {
+		setDefaultConfig(devSpace, s.Config)
+
 		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Create(c.Request.Context(), devSpace, metav1.CreateOptions{})
 		if err != nil {
 			c.Error(err)

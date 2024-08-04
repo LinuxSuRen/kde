@@ -136,11 +136,14 @@ type DevSpaceList struct {
 }
 
 const (
-	AnnoKeyExposePorts     = "linuxsuren.github.io/expose-ports"
-	AnnoKeyWebhookToken    = "linuxsuren.github.io/webhook-token"
-	AnnoKeyImagePullPolicy = "linuxsuren.github.io/image-pull-policy"
-	AnnoKeyBasicAuth       = "linuxsuren.github.io/basic-auth"
-	AnnoKeyMaintainMode    = "linuxsuren.github.io/maintain-mode"
+	AnnoKeyExposePorts      = "linuxsuren.github.io/expose-ports"
+	AnnoKeyWebhookToken     = "linuxsuren.github.io/webhook-token"
+	AnnoKeyImagePullPolicy  = "linuxsuren.github.io/image-pull-policy"
+	AnnoKeyStorageClassName = "linuxsuren.github.io/storage-class-name"
+	AnnoKeyVolumeAccessMode = "linuxsuren.github.io/volume-access-mode"
+	AnnoKeyVolumeMode       = "linuxsuren.github.io/volume-mode"
+	AnnoKeyBasicAuth        = "linuxsuren.github.io/basic-auth"
+	AnnoKeyMaintainMode     = "linuxsuren.github.io/maintain-mode"
 )
 
 func init() {

@@ -1,0 +1,6 @@
+{
+    "storageClassName": "local-path",
+    "volumeMode": "Filesystem",
+    "volumeAccessMode": "ReadWriteOnce",
+    "ingressMode": "nginx"
+}

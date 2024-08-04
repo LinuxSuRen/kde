@@ -23,6 +23,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
 	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
+	"github.com/linuxsuren/kde/pkg/core"
+	"github.com/spf13/cobra"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
@@ -31,34 +33,55 @@ import (
 )
 
 func main() {
+	opt := &option{}
+	cmd := cobra.Command{
+		Use:   "kde",
+		Short: "A Kubernetes DevSpace manager",
+		Run:   opt.runE,
+	}
+	cmd.Flags().StringVar(&opt.address, "address", ":8080", "The address to listen")
+	cmd.Flags().StringVar(&opt.config, "config", "", "The config file")
+	cmd.Flags().StringVar(&opt.kubeConfig, "kube-config", "$HOME/.kube/config", "The kube config file")
+	if err := cmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+type option struct {
+	address    string
+	config     string
+	kubeConfig string
+}
+
+func (o *option) runE(cmd *cobra.Command, args []string) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		config, err = clientcmd.BuildConfigFromFlags("", os.ExpandEnv("$HOME/.kube/config"))
+		config, err = clientcmd.BuildConfigFromFlags("", os.ExpandEnv(o.kubeConfig))
 		if err != nil {
-			panic(err.Error())
+			return
 		}
 	}
 
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		return
 	}
 
 	var dyClient dynamic.Interface
 	if dyClient, err = dynamic.NewForConfig(config); err != nil {
-		panic(err.Error())
+		return
 	}
 
 	var kClient *kdeClient.Clientset
 	if kClient, err = kdeClient.NewForConfig(config); err != nil {
-		panic(err.Error())
+		return
 	}
 
 	var extClient *apiextensionsclientset.Clientset
 	if extClient, err = apiextensionsclientset.NewForConfig(config); err != nil {
-		panic(err.Error())
+		return
 	}
 
 	server := &apiserver.Server{
@@ -68,12 +91,15 @@ func main() {
 		ExtClient: extClient,
 	}
 
+	if o.config != "" {
+		if server.Config, err = core.ReadConfigFromJSONFile(o.config); err != nil {
+			return
+		}
+	} else {
+		server.Config = &core.Config{}
+	}
+
 	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
 	r.GET("/devspace", server.ListDevSpace)
 	r.POST("/devspace", server.CreateDevSpace)
 	r.DELETE("/devspace/:devspace", server.DeleteDevSpace)
@@ -95,5 +121,5 @@ func main() {
 			"message": "ok",
 		})
 	})
-	r.Run()
+	r.Run(o.address)
 }
