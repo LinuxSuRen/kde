@@ -41,3 +41,7 @@ items:
             }
       expect:
         statusCode: 200
+    - name: language
+      request:
+        api: /languages
+        method: GET

@@ -151,7 +151,7 @@ install-tools:
 	hd i kubebuilder@v4.1.1
 
 atest:
-	atest server --local-storage 'hack/atest/*.yaml' --http-port 7890
+	atest server --local-storage 'hack/atest/*.yaml' --http-port 9090
 
 clientset:
 	./hack/generate_client.sh ${GV}

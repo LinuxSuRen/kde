@@ -147,6 +147,7 @@ spec:
               subPath: docker
             - mountPath: /var/run
               name: container-runtime
+        {{if .Spec.Services.Docker}}
         - image: ghcr.io/linuxsuren/library/docker:27.0.3-dind
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: docker
@@ -170,6 +171,7 @@ spec:
               readOnly: false
             - mountPath: /etc/docker
               name: config
+        {{end}}
       securityContext:
         runAsNonRoot: false
       volumes:

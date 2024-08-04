@@ -25,7 +25,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 
-interface User {
+interface DevSpace {
     status: {
         phase: string
         link: string
@@ -36,22 +36,18 @@ interface User {
     row,
     rowIndex,
   }: {
-    row: User
+    row: DevSpace
     rowIndex: number
   }) => {
     if (rowIndex === 1) {
       return 'warning-row'
-    } else if (row.status.phase === 'Ready') {
+    } else if (row?.status?.phase === 'Ready') {
       return 'success-row'
     }
     return ''
   }
   
-const tableData = ref([{
-  metadata: {
-    name: 'sample'
-  }
-}])
+const tableData = ref([] as DevSpace[])
 const loadData = () => {
     fetch('/api/devspace', {
         method: 'GET'

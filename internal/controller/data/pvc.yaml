@@ -13,7 +13,7 @@ metadata:
       uid: {{.ObjectMeta.UID}}
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   {{if .ObjectMeta.Annotations.storageClassName}}
   storageClassName: {{ .ObjectMeta.Annotations.storageClassName }}
   {{end}}

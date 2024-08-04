@@ -46,6 +46,20 @@ type DevSpaceSpec struct {
 	Environment map[string]string `json:"env,omitempty"`
 	Windows     []Window          `json:"windows,omitempty"`
 	InitScript  string            `json:"initScript,omitempty"`
+	Services    Services          `json:"services,omitempty"`
+}
+
+type Services struct {
+	Docker *Service `json:"docker,omitempty"`
+	MySQL  *Service `json:"mysql,omitempty"`
+}
+
+type Service struct {
+	Name     string `json:"name"`
+	Image    string `json:"image,omitempty"`
+	Enabled  bool   `json:"enabled,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
 }
 
 type Window struct {

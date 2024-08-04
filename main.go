@@ -79,9 +79,11 @@ func main() {
 	r.DELETE("/devspace/:devspace", server.DeleteDevSpace)
 	r.PUT("/devspace/:devspace", server.UpdateDevSpace)
 	r.GET("/devspace/:devspace", server.GetDevSpace)
+	r.GET("/languages", server.GetDevSpaceLanguages)
 	r.POST("/install", server.Install)
 	r.DELETE("/uninstall", server.Uninstall)
 	r.GET("/instanceStatus", server.InstanceStatus)
+	r.GET("/ws/instanceStatus", server.InstanceStatusWS)
 	r.GET("/namespaces", server.Namespaces)
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{

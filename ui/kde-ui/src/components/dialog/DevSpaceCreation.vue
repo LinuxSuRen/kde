@@ -12,19 +12,10 @@ interface DevLanguage {
   image: string
 }
 
-const devLanguages = ref([{
-  name: 'golang',
-  image: 'ghcr.io/linuxsuren/openvscode-server-golang:v0.0.8'
-}, {
-    name: 'nodejs',
-    image: 'ghcr.io/linuxsuren/openvscode-server-nodejs:v0.0.8'
-}, {
-    name: 'java',
-    image: 'ghcr.io/linuxsuren/openvscode-server-java:v0.0.8'
-}, {
-    name: 'full',
-    image: 'ghcr.io/linuxsuren/openvscode-server-full:v0.0.8'
-}])
+const devLanguages = ref([])
+fetch('/api/languages', {}).then(res => res.json()).then(data => {
+    devLanguages.value = data
+})
 
 interface DevSpace {
   name: string
@@ -43,7 +34,7 @@ const createDevSpace = async (devSpace: DevSpace) =>  {
                 "storageTemporary1": "a",
                 "ingressMode": "path1",
                 "volumeMode": "Filesystem",
-                "storageClassName": "rook-cephfs"
+                "storageClassName1": "rook-cephfs"
               }
             },
             "spec": {
