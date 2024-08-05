@@ -41,7 +41,7 @@ const createDevSpace = async (devSpace: DevSpace) =>  {
               "cpu": "100m",
               "memory": "100Mi",
               "host": "dev-center.jenkins-zh.cn",
-              "iamge": "${devSpace.image}"
+              "image": "${devSpace.image}"
             }
             }`
     }).then(res => {
