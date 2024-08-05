@@ -32,6 +32,7 @@ import (
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type Querier interface {
@@ -80,7 +81,10 @@ func (s *Server) Install(c *gin.Context) {
 	ingress.SetNamespace(namespace)
 	_, ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Create(ctx, ingress, metav1.CreateOptions{})
 
-	err := errors.Join(crdDevSpaceErr, crdUserErr, saErr, cmErr, deployErr, apiserverDeployErr, serviceErr, ingressErr)
+	err := errors.Join(client.IgnoreAlreadyExists(crdDevSpaceErr), client.IgnoreAlreadyExists(crdUserErr),
+		client.IgnoreAlreadyExists(saErr), client.IgnoreAlreadyExists(cmErr),
+		client.IgnoreAlreadyExists(deployErr), client.IgnoreAlreadyExists(apiserverDeployErr),
+		client.IgnoreAlreadyExists(serviceErr), client.IgnoreAlreadyExists(ingressErr))
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, err)
@@ -92,6 +96,12 @@ func (s *Server) Install(c *gin.Context) {
 func (s *Server) Uninstall(c *gin.Context) {
 	ctx := c.Request.Context()
 	namespace := getNamespaceFromQuery(c)
+
+	crdDevSpace := getCRD("linuxsuren.github.io_devspaces.yaml")
+	crdDevSpaceErr := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Delete(ctx, crdDevSpace.GetName(), metav1.DeleteOptions{})
+
+	crdUser := getCRD("linuxsuren.github.io_users.yaml")
+	crdUserErr := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Delete(ctx, crdUser.GetName(), metav1.DeleteOptions{})
 
 	sa := getServiceAccount("service_account.yaml")
 	saErr := s.Client.CoreV1().ServiceAccounts(namespace).Delete(ctx, sa.GetName(), metav1.DeleteOptions{})
@@ -111,7 +121,10 @@ func (s *Server) Uninstall(c *gin.Context) {
 	ingress := getIngress("ingress.yaml")
 	ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Delete(ctx, ingress.GetName(), metav1.DeleteOptions{})
 
-	err := errors.Join(saErr, cmErr, deployErr, apiserverDeployErr, serviceErr, ingressErr)
+	err := errors.Join(client.IgnoreNotFound(crdDevSpaceErr), client.IgnoreNotFound(crdUserErr),
+		client.IgnoreNotFound(saErr), client.IgnoreNotFound(cmErr), client.IgnoreNotFound(deployErr),
+		client.IgnoreNotFound(apiserverDeployErr), client.IgnoreNotFound(serviceErr),
+		client.IgnoreNotFound(ingressErr))
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, err)
