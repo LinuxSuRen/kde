@@ -142,6 +142,7 @@ const (
 	AnnoKeyStorageClassName = "linuxsuren.github.io/storage-class-name"
 	AnnoKeyVolumeAccessMode = "linuxsuren.github.io/volume-access-mode"
 	AnnoKeyVolumeMode       = "linuxsuren.github.io/volume-mode"
+	AnnoKeyIngressMode      = "linuxsuren.github.io/ingress-mode"
 	AnnoKeyBasicAuth        = "linuxsuren.github.io/basic-auth"
 	AnnoKeyMaintainMode     = "linuxsuren.github.io/maintain-mode"
 )

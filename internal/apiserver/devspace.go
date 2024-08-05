@@ -42,6 +42,7 @@ type Server struct {
 }
 
 func (s *Server) CreateDevSpace(c *gin.Context) {
+	namespace := getNamespaceFromQuery(c)
 	fmt.Println("CreateDevSpace")
 	// clone git repo
 
@@ -54,7 +55,7 @@ func (s *Server) CreateDevSpace(c *gin.Context) {
 	} else {
 		setDefaultConfig(devSpace, s.Config)
 
-		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Create(c.Request.Context(), devSpace, metav1.CreateOptions{})
+		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Create(c.Request.Context(), devSpace, metav1.CreateOptions{})
 		if err != nil {
 			c.Error(err)
 		} else {
@@ -68,7 +69,8 @@ func (s *Server) CreateDevSpace(c *gin.Context) {
 }
 
 func (s *Server) ListDevSpace(c *gin.Context) {
-	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").List(c.Request.Context(), metav1.ListOptions{})
+	namespace := getNamespaceFromQuery(c)
+	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).List(c.Request.Context(), metav1.ListOptions{})
 	if err != nil {
 		c.Error(err)
 	} else {
@@ -78,7 +80,8 @@ func (s *Server) ListDevSpace(c *gin.Context) {
 
 func (s *Server) DeleteDevSpace(c *gin.Context) {
 	name := c.Params.ByName("devspace")
-	err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Delete(c.Request.Context(), name, metav1.DeleteOptions{})
+	namespace := getNamespaceFromQuery(c)
+	err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Delete(c.Request.Context(), name, metav1.DeleteOptions{})
 	if err != nil {
 		c.Error(err)
 	} else {
@@ -88,12 +91,13 @@ func (s *Server) DeleteDevSpace(c *gin.Context) {
 
 func (s *Server) UpdateDevSpace(c *gin.Context) {
 	name := c.Params.ByName("devspace")
+	namespace := getNamespaceFromQuery(c)
 	devSpace := &v1alpha1.DevSpace{}
 	devSpace.Name = name
 	if err := c.BindJSON(devSpace); err != nil {
 		c.Error(err)
 	} else {
-		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Update(c.Request.Context(), devSpace, metav1.UpdateOptions{})
+		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Update(c.Request.Context(), devSpace, metav1.UpdateOptions{})
 		if err != nil {
 			c.Error(err)
 		} else {
@@ -104,7 +108,8 @@ func (s *Server) UpdateDevSpace(c *gin.Context) {
 
 func (s *Server) GetDevSpace(c *gin.Context) {
 	name := c.Params.ByName("devspace")
-	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces("default").Get(c.Request.Context(), name, metav1.GetOptions{})
+	namespace := getNamespaceFromQuery(c)
+	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Get(c.Request.Context(), name, metav1.GetOptions{})
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, err)

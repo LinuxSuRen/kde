@@ -100,17 +100,18 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 	}
 
 	r := gin.Default()
-	r.GET("/devspace", server.ListDevSpace)
-	r.POST("/devspace", server.CreateDevSpace)
-	r.DELETE("/devspace/:devspace", server.DeleteDevSpace)
-	r.PUT("/devspace/:devspace", server.UpdateDevSpace)
-	r.GET("/devspace/:devspace", server.GetDevSpace)
-	r.GET("/languages", server.GetDevSpaceLanguages)
-	r.POST("/install", server.Install)
-	r.DELETE("/uninstall", server.Uninstall)
-	r.GET("/instanceStatus", server.InstanceStatus)
-	r.GET("/ws/instanceStatus", server.InstanceStatusWS)
-	r.GET("/namespaces", server.Namespaces)
+	apiserver.RegisterStaticFilesHandle(r)
+	r.GET("/api/devspace", server.ListDevSpace)
+	r.POST("/api/devspace", server.CreateDevSpace)
+	r.DELETE("/api/devspace/:devspace", server.DeleteDevSpace)
+	r.PUT("/api/devspace/:devspace", server.UpdateDevSpace)
+	r.GET("/api/devspace/:devspace", server.GetDevSpace)
+	r.GET("/api/languages", server.GetDevSpaceLanguages)
+	r.POST("/api/install", server.Install)
+	r.DELETE("/api/uninstall", server.Uninstall)
+	r.GET("/api/instanceStatus", server.InstanceStatus)
+	r.GET("/api/ws/instanceStatus", server.InstanceStatusWS)
+	r.GET("/api/namespaces", server.Namespaces)
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "ok",

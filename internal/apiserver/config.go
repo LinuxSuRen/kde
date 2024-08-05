@@ -37,4 +37,7 @@ func setDefaultConfig(devspace *v1alpha1.DevSpace, config *core.Config) {
 	if _, ok := devspace.Annotations[v1alpha1.AnnoKeyVolumeMode]; !ok {
 		devspace.Annotations[v1alpha1.AnnoKeyVolumeMode] = config.VolumeMode
 	}
+	if _, ok := devspace.Annotations[v1alpha1.AnnoKeyIngressMode]; !ok {
+		devspace.Annotations[v1alpha1.AnnoKeyIngressMode] = config.IngressMode
+	}
 }

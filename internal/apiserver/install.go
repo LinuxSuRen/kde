@@ -34,12 +34,21 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-func (s *Server) Install(c *gin.Context) {
-	ctx := c.Request.Context()
-	namespace := c.DefaultQuery("namespace", "default")
+type Querier interface {
+	DefaultQuery(key, defaultValue string) string
+}
+
+func getNamespaceFromQuery(querier Querier) string {
+	namespace := querier.DefaultQuery("namespace", "default")
 	if namespace == "" {
 		namespace = "default"
 	}
+	return namespace
+}
+
+func (s *Server) Install(c *gin.Context) {
+	ctx := c.Request.Context()
+	namespace := getNamespaceFromQuery(c)
 
 	crdDevSpace := getCRD("linuxsuren.github.io_devspaces.yaml")
 	_, crdDevSpaceErr := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, crdDevSpace, metav1.CreateOptions{})
@@ -82,10 +91,7 @@ func (s *Server) Install(c *gin.Context) {
 
 func (s *Server) Uninstall(c *gin.Context) {
 	ctx := c.Request.Context()
-	namespace := c.DefaultQuery("namespace", "default")
-	if namespace == "" {
-		namespace = "default"
-	}
+	namespace := getNamespaceFromQuery(c)
 
 	sa := getServiceAccount("service_account.yaml")
 	saErr := s.Client.CoreV1().ServiceAccounts(namespace).Delete(ctx, sa.GetName(), metav1.DeleteOptions{})
@@ -193,10 +199,7 @@ func (s *Server) InstanceStatus(c *gin.Context) {
 
 func (s *Server) InstanceStatusWS(c *gin.Context) {
 	ctx := c.Request.Context()
-	namespace := c.DefaultQuery("namespace", "default")
-	if namespace == "" {
-		namespace = "default"
-	}
+	namespace := getNamespaceFromQuery(c)
 
 	var upgrader = websocket.Upgrader{
 		ReadBufferSize:  1024,
