@@ -1,7 +1,7 @@
 // This is a dialog for devspace creation
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance } from 'element-plus';
+import { reactive, ref } from 'vue';
 
 const props = defineProps({
     visible: Boolean,
@@ -12,7 +12,7 @@ interface DevLanguage {
   image: string
 }
 
-const devLanguages = ref([])
+const devLanguages = ref([] as DevLanguage[])
 fetch('/api/languages', {}).then(res => res.json()).then(data => {
     devLanguages.value = data
 })

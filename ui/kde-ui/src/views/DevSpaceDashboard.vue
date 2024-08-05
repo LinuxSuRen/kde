@@ -26,6 +26,9 @@
 import { ref } from 'vue'
 
 interface DevSpace {
+    metadata: {
+        name: string
+    }
     status: {
         phase: string
         link: string
