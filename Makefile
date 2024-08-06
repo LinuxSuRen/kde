@@ -85,7 +85,7 @@ build: manifests generate fmt vet ## Build manager binary.
 	go build -o bin/manager cmd/main.go
 
 build-ui:
-	cd ui/kde-ui && npm run build
+	cd ui/kde-ui && npm i && npm run build
 
 .PHONY: run
 run: manifests generate fmt vet ## Run a controller from your host.
