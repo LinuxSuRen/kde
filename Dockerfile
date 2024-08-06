@@ -29,7 +29,7 @@ COPY config/ config/
 COPY internal/ internal/
 COPY pkg/ pkg/
 COPY main.go main.go
-COPY --from=node /workspace/ui/kde-ui/dist ui/kde-ui/dist
+COPY --from=node /workspace/dist ui/kde-ui/dist
 
 # Build
 # the GOARCH has not a default value to allow the binary be built according to the host where the command
