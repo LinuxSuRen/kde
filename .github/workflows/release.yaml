@@ -62,6 +62,7 @@ jobs:
             VERSION=${{ steps.vars.outputs.tag }}
             BUILDER=golang:1.22
             RUNTIME=gcr.io/distroless/static:nonroot
+            NODE=node:22
 
   goreleaser:
     runs-on: ubuntu-22.04
