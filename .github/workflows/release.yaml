@@ -58,4 +58,30 @@ jobs:
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          build-args: VERSION=${{ steps.vars.outputs.tag }}
+          build-args: |
+            VERSION=${{ steps.vars.outputs.tag }}
+            BUILDER=golang:1.22
+            RUNTIME=gcr.io/distroless/static:nonroot
+
+  goreleaser:
+    runs-on: ubuntu-22.04
+    if: github.ref != 'refs/heads/master'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: "npm"
+          cache-dependency-path: ui/kde-ui/package-lock.json
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          version: "~> v2"
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PUBLISH_SECRETS }}

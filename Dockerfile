@@ -1,4 +1,5 @@
 # Build the manager binary
+ARG RUNTIME=ghcr.io/linuxsuren/distroless/static:nonroot
 ARG BUILDER=ghcr.io/linuxsuren/library/golang:1.22
 FROM ${BUILDER} AS builder
 ARG TARGETOS
@@ -33,7 +34,7 @@ RUN CGO_ENABLED=0 GOOS=${TARGETOS:-linux} GOARCH=${TARGETARCH} go build -a -o se
 
 # Use distroless as minimal base image to package the manager binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM ghcr.io/linuxsuren/distroless/static:nonroot
+FROM ${RUNTIME}
 WORKDIR /
 COPY --from=builder /workspace/manager .
 COPY --from=builder /workspace/server .
