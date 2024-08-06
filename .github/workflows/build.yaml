@@ -55,6 +55,12 @@ jobs:
         with:
           fetch-tags: true
           fetch-depth: 0
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.x
+          cache: "npm"
+          cache-dependency-path: ui/kde-ui/package-lock.json
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
