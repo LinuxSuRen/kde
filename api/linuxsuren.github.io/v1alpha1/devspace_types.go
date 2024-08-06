@@ -52,6 +52,7 @@ type DevSpaceSpec struct {
 type Services struct {
 	Docker *Service `json:"docker,omitempty"`
 	MySQL  *Service `json:"mysql,omitempty"`
+	Redis  *Service `json:"redis,omitempty"`
 }
 
 type Service struct {

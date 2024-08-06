@@ -41,7 +41,7 @@ func main() {
 	}
 	cmd.Flags().StringVar(&opt.address, "address", ":8080", "The address to listen")
 	cmd.Flags().StringVar(&opt.config, "config", "", "The config file")
-	cmd.Flags().StringVar(&opt.kubeConfig, "kube-config", "$HOME/.kube/config", "The kube config file")
+	cmd.Flags().StringVar(&opt.kubeConfig, "kube-config", os.ExpandEnv("$HOME/.kube/config"), "The kube config file")
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -55,9 +55,9 @@ type option struct {
 
 func (o *option) runE(cmd *cobra.Command, args []string) {
 	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
+	config, err := clientcmd.BuildConfigFromFlags("", os.ExpandEnv(o.kubeConfig))
 	if err != nil {
-		config, err = clientcmd.BuildConfigFromFlags("", os.ExpandEnv(o.kubeConfig))
+		config, err = rest.InClusterConfig()
 		if err != nil {
 			return
 		}

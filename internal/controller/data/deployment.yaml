@@ -172,6 +172,19 @@ spec:
             - mountPath: /etc/docker
               name: config
         {{end}}
+        {{if .Spec.Services.Redis}}
+        - image: ghcr.io/linuxsuren/library/redis:7.0.14
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
+          name: redis
+        {{end}}
+        {{if .Spec.Services.MySQL}}
+        - image: ghcr.io/linuxsuren/library/mysql:8.2.0
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
+          name: mysql
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: {{or .Spec.Services.MySQL.Password "root"}}
+        {{end}}
       securityContext:
         runAsNonRoot: false
       volumes:
