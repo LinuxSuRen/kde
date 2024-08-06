@@ -1,6 +1,12 @@
 # Build the manager binary
 ARG RUNTIME=ghcr.io/linuxsuren/distroless/static:nonroot
 ARG BUILDER=ghcr.io/linuxsuren/library/golang:1.22
+ARG NODE=ghcr.io/linuxsuren/library/node:22
+FROM ${NODE} AS node
+WORKDIR /workspace
+COPY ui/kde-ui/ .
+RUN npm install && npm run build
+
 FROM ${BUILDER} AS builder
 ARG TARGETOS
 ARG TARGETARCH
@@ -23,6 +29,7 @@ COPY config/ config/
 COPY internal/ internal/
 COPY pkg/ pkg/
 COPY main.go main.go
+COPY --from=node /workspace/ui/kde-ui/dist ui/kde-ui/dist
 
 # Build
 # the GOARCH has not a default value to allow the binary be built according to the host where the command
