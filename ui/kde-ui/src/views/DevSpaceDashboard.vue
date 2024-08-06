@@ -1,10 +1,23 @@
 <template>
+    <el-button type="primary" @click="devSpaceCreationVisible = true">New</el-button>
+    <el-button type="primary" @click="loadData">Reload</el-button>
     <el-table
       :data="tableData"
       style="width: 100%"
       :row-class-name="tableRowClassName"
     >
-      <el-table-column prop="metadata.name" label="Name" width="100" />
+      <el-table-column prop="metadata.name" label="Name" width="100">
+        <template #default="scope">
+          <el-button
+            link
+            type="primary"
+            size="small"
+            @click.prevent="router.push({ path: '/dev', query: { name: scope.row.metadata.name } })"
+          >
+          {{ scope.row.metadata.name}}
+          </el-button>
+        </template>
+      </el-table-column>
       <el-table-column prop="status.link" label="Address" />
       <el-table-column prop="status.phase" label="Status" width="80" />
       <el-table-column fixed="right" label="Operations" min-width="80">
@@ -20,10 +33,16 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <DevSpaceCreation :visible="devSpaceCreationVisible" @closed="devSpaceCreationVisible=false" @created="loadData()"/>
 </template>
   
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import DevSpaceCreation from '../components/dialog/DevSpaceCreation.vue';
+
+const router = useRouter();
 
 interface DevSpace {
     metadata: {
@@ -69,6 +88,8 @@ const deleteRow = (index: number) => {
         loadData()
     })
 }
+
+const devSpaceCreationVisible = ref(false)
 </script>
   
 <style>

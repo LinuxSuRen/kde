@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import DevSpaceCreation from '../components/dialog/DevSpaceCreation.vue'
+import { ElMessageBox } from 'element-plus';
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
+const router = useRouter();
+const route = useRoute();
 interface DevSpace {
     status: {
         phase: string
@@ -10,40 +13,65 @@ interface DevSpace {
     }
 }
 
+interface DevSpaceStatus {
+    name: string
+    status: string
+}
+
+const devSpaceStatus = ref([] as DevSpaceStatus[])
 const devSpace = ref({} as DevSpace)
-const devSpaceCreationVisible = ref(false)
 
 const loading = async () => {
-    const name = 'sample'
+    if (!route.query.name) {
+        router.push({
+            path: '/dashboard',
+        })
+        return
+    }
 
-    fetch(`/api/devspace/${name}`, {
+    fetch(`/api/devspace/${route.query.name}`, {
         method: 'GET'
     }).then(res => {
         return res.json()
     }).then(res => {
         devSpace.value = res
-        devSpaceCreationVisible.value = res?.ErrStatus?.code === 404
+
+        devSpaceStatus.value = [{
+            name: 'Request',
+            status: res?.status?.phase
+        }, {
+            name: 'Deployment',
+            status: res?.status?.deployStatus
+        }]
     }).catch(err => {
         console.log(err)
     })
 }
 
-setInterval(() => {
+const autoReload = setInterval(() => {
     loading()
 }, 2000)
 
+const openIDE = () => {
+    // open in a new window
+    window.open(`http://${devSpace.value?.status?.link}`)
+}
+
 watch(() => devSpace.value?.status?.deployStatus, (p) => {
-    if (p === 'Ready') {
-        window.location.href = `http://${devSpace.value?.status?.link}`
+    if (p === 'Running') {
+        ElMessageBox.confirm(`Are you confirm to open your IDE?`).then(openIDE)
+        clearInterval(autoReload)
     }
 })
 </script>
 
 <template>
     <div class="about">
-        <h2>Request Status: {{ devSpace.status?.phase }}</h2>
-        <h2>Env Status: {{ devSpace.status?.deployStatus }}</h2>
-    </div>
+        <el-button type="primary" @click="openIDE" v-if="devSpace?.status?.deployStatus === 'Running'">Open</el-button>
 
-    <DevSpaceCreation :visible="devSpaceCreationVisible"/>
+        <el-table :data="devSpaceStatus">
+            <el-table-column prop="name" label="Name" />
+            <el-table-column prop="status" label="Status" />
+        </el-table>
+    </div>
 </template>

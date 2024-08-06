@@ -2,10 +2,14 @@
 <script setup lang="ts">
 import type { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const props = defineProps({
     visible: Boolean,
 })
+
+const emit = defineEmits(['created', 'closed'])
 
 interface DevLanguage {
   name: string
@@ -20,38 +24,59 @@ fetch('/api/languages', {}).then(res => res.json()).then(data => {
 interface DevSpace {
   name: string
   image: string
+  docker: boolean
+  cpu: string
+  memory: string
 }
 
 const createDevSpace = async (devSpace: DevSpace) =>  {
+  const body = `{
+              "apiVersion": "linuxsuren.github.io/v1alpha1",
+              "kind": "DevSpace",
+              "metadata": {
+                "name": "${devSpace.name}",
+                "annotations": {
+                  "storageTemporary1": "a",
+                  "ingressMode": "path1",
+                  "volumeMode": "Filesystem",
+                  "storageClassName1": "rook-cephfs"
+                }
+              },
+              "spec": {
+                "cpu": "${devSpace.cpu}",
+                "memory": "${devSpace.memory}",
+                "host": "dev-center.jenkins-zh.cn",
+                "image": "${devSpace.image}"
+              }
+            }`
+
+    const bodyObj = JSON.parse(body)
+    if (devSpace.docker) {
+        bodyObj.spec.services= {
+          docker: {
+            enabled: true
+          }
+        }
+    }
+
     fetch(`/api/devspace`, {
         method: 'POST',
-        body: `{
-            "apiVersion": "linuxsuren.github.io/v1alpha1",
-            "kind": "DevSpace",
-            "metadata": {
-              "name": "${devSpace.name}",
-              "annotations": {
-                "storageTemporary1": "a",
-                "ingressMode": "path1",
-                "volumeMode": "Filesystem",
-                "storageClassName1": "rook-cephfs"
-              }
-            },
-            "spec": {
-              "cpu": "100m",
-              "memory": "100Mi",
-              "host": "dev-center.jenkins-zh.cn",
-              "image": "${devSpace.image}"
-            }
-            }`
+        body: JSON.stringify(bodyObj),
+        headers: {
+            'Content-Type': 'application/json'
+        }
     }).then(res => {
+        router.push(`/dev?name=${ruleForm.name}`)
         return res.json()
+    }).finally(() => {
+        emit('created')
     })
 }
 
 const ruleFormRef = ref<FormInstance>()
 const ruleForm = reactive({
-  name: "sample"
+  cpu: "2",
+  memory: "4Gi"
 } as DevSpace)
 
 const submitForm = (formEl: FormInstance | undefined) => {
@@ -63,11 +88,16 @@ const submitForm = (formEl: FormInstance | undefined) => {
       console.log('error submit!')
     }
   })
+  emit('closed')
 }
 
 const resetForm = (formEl: FormInstance | undefined) => {
   if (!formEl) return
   formEl.resetFields()
+}
+
+const cancelDialog = () => {
+  emit('closed')
 }
 </script>
 
@@ -76,8 +106,7 @@ const resetForm = (formEl: FormInstance | undefined) => {
     :modelValue="visible"
     title="Create DevSpace"
     width="500"
-    destroy-on-close
-    center
+    :before-close="cancelDialog"
   >
     <el-form
       ref="ruleFormRef"
@@ -103,6 +132,17 @@ const resetForm = (formEl: FormInstance | undefined) => {
             :value="item.image"
           />
         </el-select>
+      </el-form-item>
+      <el-form-item label="CPU" prop="cpu">
+        <el-input v-model="ruleForm.cpu" />
+      </el-form-item>
+      <el-form-item label="Memory" prop="memory">
+        <el-input v-model="ruleForm.memory" />
+      </el-form-item>
+      <el-form-item label="Service" prop="docker">
+        <el-checkbox v-model="ruleForm.docker">
+          Docker
+        </el-checkbox>
       </el-form-item>
 
       <el-form-item>

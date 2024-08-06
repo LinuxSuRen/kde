@@ -19,7 +19,6 @@ package apiserver
 import (
 	"embed"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -43,7 +42,6 @@ type Server struct {
 
 func (s *Server) CreateDevSpace(c *gin.Context) {
 	namespace := getNamespaceFromQuery(c)
-	fmt.Println("CreateDevSpace")
 	// clone git repo
 
 	// find the config file
@@ -58,6 +56,7 @@ func (s *Server) CreateDevSpace(c *gin.Context) {
 		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Create(c.Request.Context(), devSpace, metav1.CreateOptions{})
 		if err != nil {
 			c.Error(err)
+			c.JSON(http.StatusBadRequest, err)
 		} else {
 			c.JSON(http.StatusOK, result)
 		}
@@ -73,6 +72,7 @@ func (s *Server) ListDevSpace(c *gin.Context) {
 	result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).List(c.Request.Context(), metav1.ListOptions{})
 	if err != nil {
 		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
 	} else {
 		c.JSON(http.StatusOK, result)
 	}
@@ -84,6 +84,7 @@ func (s *Server) DeleteDevSpace(c *gin.Context) {
 	err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Delete(c.Request.Context(), name, metav1.DeleteOptions{})
 	if err != nil {
 		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
 	} else {
 		c.JSON(http.StatusOK, "")
 	}
@@ -100,6 +101,7 @@ func (s *Server) UpdateDevSpace(c *gin.Context) {
 		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Update(c.Request.Context(), devSpace, metav1.UpdateOptions{})
 		if err != nil {
 			c.Error(err)
+			c.JSON(http.StatusBadRequest, err)
 		} else {
 			c.JSON(http.StatusOK, result)
 		}

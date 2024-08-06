@@ -106,6 +106,39 @@ spec:
                 - url
                 - username
                 type: object
+              services:
+                properties:
+                  docker:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  mysql:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                type: object
               storage:
                 default: 50Gi
                 description: Storage is the storage size

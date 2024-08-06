@@ -19,6 +19,7 @@ package apiserver
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -262,11 +263,11 @@ func (s *Server) getCRDStatus(ctx context.Context, name string) InstanceStatus {
 
 func (s *Server) getDeploymentStatus(ctx context.Context, namespace, name string) InstanceStatus {
 	deploy := getDeployment(name + ".yaml")
-	if _, err := s.Client.AppsV1().Deployments(namespace).Get(ctx, deploy.Name, metav1.GetOptions{}); err == nil {
+	if deploy, err := s.Client.AppsV1().Deployments(namespace).Get(ctx, deploy.Name, metav1.GetOptions{}); err == nil {
 		return InstanceStatus{
 			Component: "Deployment",
 			Name:      name,
-			Status:    "installed",
+			Status:    fmt.Sprintf("installed: %d/%d", deploy.Status.ReadyReplicas, deploy.Status.Replicas),
 		}
 	} else {
 		return InstanceStatus{

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import {ref, reactive, h, watch} from 'vue'
-import { ElNotification } from 'element-plus'
+import { ElNotification } from 'element-plus';
+import { reactive, ref, watch } from 'vue';
 
 const active = ref('Install')
 
@@ -73,7 +73,7 @@ const uninstall = () => {
 </script>
 
 <template>
-    <div style="height: 300px; max-width: 600px">
+    <div style="height: 300px">
         <el-tabs type="border-card" v-model="active">
             <el-tab-pane name="Install">
                 <template #label>
@@ -119,7 +119,7 @@ const uninstall = () => {
             <el-tab-pane name="Configuration">
                 <template #label>
                     <span class="custom-tabs-label">
-                      <span>Configuration</span>
+                        <span>Configuration</span>
                     </span>
                 </template>
                 Configuration
