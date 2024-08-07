@@ -2,16 +2,10 @@
 import { ElMessageBox } from 'element-plus';
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import type { DevSpace } from './types';
 
 const router = useRouter();
 const route = useRoute();
-interface DevSpace {
-    status: {
-        phase: string
-        deployStatus: string
-        link: string
-    }
-}
 
 interface DevSpaceStatus {
     name: string

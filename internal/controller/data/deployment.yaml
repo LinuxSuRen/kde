@@ -44,6 +44,16 @@ spec:
                   linuxsuren.github.io/application: {{.ObjectMeta.Name}}
               topologyKey: kubernetes.io/hostname
             weight: 5
+      {{ if .Spec.HostAliases }}
+      hostAliases:
+      {{ range $item := .Spec.HostAliases }}
+      - ip: {{ $item.IP }}
+        hostnames:
+        {{ range $host := $item.Hostnames }}
+        - {{ $host }}
+        {{ end }}
+      {{ end }}
+      {{ end }}
       initContainers:
         - image: {{.Spec.Image}}
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}

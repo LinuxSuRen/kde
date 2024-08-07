@@ -23,6 +23,11 @@ const router = createRouter({
             component: () => import('../views/DevSpaceStarter.vue')
         },
         {
+            path: '/devspace/:namespace/:name',
+            name: 'devspace',
+            component: () => import('../views/DevSpaceEditor.vue')
+        },
+        {
             path: '/dashboard',
             name: 'devdashboard',
             component: () => import('../views/DevSpaceDashboard.vue')

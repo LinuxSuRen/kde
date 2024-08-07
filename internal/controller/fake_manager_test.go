@@ -1,5 +1,5 @@
 /*
-Copyright 2024 kde authrors.
+Copyright 2024 kde authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -57,4 +57,3 @@ func TestFakeManager(t *testing.T) {
 	assert.Equal(t, logr.New(log.NullLogSink{}), fake.GetLogger())
 	assert.NotNil(t, fake.GetControllerOptions())
 }
-
