@@ -1,0 +1,10 @@
+apiVersion: linuxsuren.github.io/v1alpha1
+kind: DevSpace
+metadata:
+  labels:
+    app.kubernetes.io/name: kde
+    app.kubernetes.io/managed-by: kustomize
+  name: devspace-sample
+status:
+  phase: Ready
+  link: https://kde.linuxsuren.io

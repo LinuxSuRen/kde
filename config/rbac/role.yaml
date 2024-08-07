@@ -1,0 +1,65 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - linuxsuren.github.io.
+  resources:
+  - devspaces
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - linuxsuren.github.io.
+  resources:
+  - devspaces/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - linuxsuren.github.io.
+  resources:
+  - devspaces/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users/status
+  verbs:
+  - get
+  - patch
+  - update

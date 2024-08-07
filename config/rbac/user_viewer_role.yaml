@@ -1,0 +1,23 @@
+# permissions for end users to view users.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: kde
+    app.kubernetes.io/managed-by: kustomize
+  name: user-viewer-role
+rules:
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users/status
+  verbs:
+  - get

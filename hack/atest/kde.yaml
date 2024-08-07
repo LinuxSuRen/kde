@@ -1,0 +1,47 @@
+#!api-testing
+# yaml-language-server: $schema=https://linuxsuren.github.io/api-testing/api-testing-schema.json
+name: kde
+api: http://localhost:8080
+items:
+    - name: createDevSpace
+      request:
+        api: /devspace
+        method: POST
+        header:
+            Content-Type: application/json
+        body: |-
+            {
+            "apiVersion": "linuxsuren.github.io/v1alpha1",
+            "kind": "DevSpace",
+            "metadata": {
+              "name": "devspace-sample"
+            },
+            "spec":{}
+            }
+      expect:
+        statusCode: 200
+    - name: ping
+      request:
+        api: /ping
+        method: GET
+    - name: getDevSpace
+      request:
+        api: /devspace/devspace-sample
+        method: GET
+        header:
+            Content-Type: application/json
+        body: |-
+            {
+            "apiVersion": "linuxsuren.github.io/v1alpha1",
+            "kind": "DevSpace",
+            "metadata": {
+              "name": "devspace-sample"
+            },
+            "spec":{}
+            }
+      expect:
+        statusCode: 200
+    - name: language
+      request:
+        api: /languages
+        method: GET

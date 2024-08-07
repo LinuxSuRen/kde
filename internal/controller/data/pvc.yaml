@@ -1,0 +1,26 @@
+{{if not .ObjectMeta.Annotations.storageTemporary}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{.ObjectMeta.Name}}
+  namespace: {{.ObjectMeta.Namespace}}
+  ownerReferences:
+    - apiVersion: linuxsuren.github.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DevSpace
+      name: {{.ObjectMeta.Name}}
+      uid: {{.ObjectMeta.UID}}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{if .ObjectMeta.Annotations.storageClassName}}
+  storageClassName: {{ .ObjectMeta.Annotations.storageClassName }}
+  {{end}}
+  {{if .ObjectMeta.Annotations.volumeMode}}
+  volumeMode: {{ .ObjectMeta.Annotations.volumeMode }}
+  {{end}}
+  resources:
+    requests:
+      storage: {{.Spec.Storage}}
+{{end}}

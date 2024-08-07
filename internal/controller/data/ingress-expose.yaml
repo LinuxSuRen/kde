@@ -1,0 +1,33 @@
+{{ if .Status.ExposeLinks }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    linuxsuren.github.io/application: {{.ObjectMeta.Name}}
+    linuxsuren.github.io/application_kind: gitpod
+  name: {{.ObjectMeta.Name}}-expose
+  namespace: {{.ObjectMeta.Namespace}}
+  ownerReferences:
+    - apiVersion: linuxsuren.github.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DevSpace
+      name: {{.ObjectMeta.Name}}
+      uid: {{.ObjectMeta.UID}}
+spec:
+  ingressClassName: nginx
+  rules:
+    {{$name:=.ObjectMeta.Name}}
+    {{ range .Status.ExposeLinks }}
+    - host: {{.Link}}
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{$name}}
+                port:
+                  number: {{.Port}}
+            path: /
+            pathType: Prefix
+    {{ end }}
+{{ end }}

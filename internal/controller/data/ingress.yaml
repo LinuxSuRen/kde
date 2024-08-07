@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    linuxsuren.github.io/application: {{.ObjectMeta.Name}}
+    linuxsuren.github.io/application_kind: gitpod
+  annotations:
+    {{ if .Spec.Auth.BasicAuth }}
+    nginx.ingress.kubernetes.io/auth-secret: {{.ObjectMeta.Name}}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    {{ else }}
+    linuxsuren.github.io/auth-type: none
+    {{ end }}
+  name: {{.ObjectMeta.Name}}
+  namespace: {{.ObjectMeta.Namespace}}
+  ownerReferences:
+    - apiVersion: linuxsuren.github.io/v1alpha1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DevSpace
+      name: {{.ObjectMeta.Name}}
+      uid: {{.ObjectMeta.UID}}
+spec:
+  {{if ne .ObjectMeta.Annotations.ingressMode "path"}}
+  ingressClassName: nginx
+  {{end}}
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: {{.ObjectMeta.Name}}
+                port:
+                  number: 3000
+            {{if ne .ObjectMeta.Annotations.ingressMode "path"}}
+            path: /
+            {{end}}
+            {{if eq .ObjectMeta.Annotations.ingressMode "path"}}
+            path: /{{.ObjectMeta.Name}}
+            {{end}}
+            pathType: Prefix
+      {{if ne .ObjectMeta.Annotations.ingressMode "path"}}
+      host: {{.Status.Link}}
+      {{ end }}

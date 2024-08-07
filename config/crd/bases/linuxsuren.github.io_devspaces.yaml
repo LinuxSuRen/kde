@@ -1,0 +1,217 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.15.0
+  name: devspaces.linuxsuren.github.io
+spec:
+  group: linuxsuren.github.io
+  names:
+    kind: DevSpace
+    listKind: DevSpaceList
+    plural: devspaces
+    singular: devspace
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.link
+      name: Link
+      type: string
+    - jsonPath: .status.deployStatus
+      name: DeployStatus
+      type: string
+    - jsonPath: .spec.replicas
+      name: Replicas
+      type: integer
+    - jsonPath: .status.phase
+      name: Phase
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: DevSpace is the Schema for the devspaces API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DevSpaceSpec defines the desired state of DevSpace
+            properties:
+              auth:
+                properties:
+                  basicAuth:
+                    properties:
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - username
+                    type: object
+                type: object
+              cpu:
+                default: "2"
+                description: CPU is the CPU limit
+                type: string
+              env:
+                additionalProperties:
+                  type: string
+                type: object
+              host:
+                description: Host is the hostname
+                type: string
+              image:
+                type: string
+              initScript:
+                type: string
+              memory:
+                default: 4Gi
+                description: Memory is the memory limit
+                type: string
+              replicas:
+                default: 1
+                description: Replicas is the number of replicas
+                format: int32
+                type: integer
+              repository:
+                properties:
+                  branch:
+                    default: master
+                    description: Branch is the branch
+                    type: string
+                  password:
+                    description: Password is the password
+                    type: string
+                  url:
+                    type: string
+                  username:
+                    description: Username is the username
+                    type: string
+                required:
+                - url
+                - username
+                type: object
+              services:
+                properties:
+                  docker:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  mysql:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                  redis:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      name:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    required:
+                    - name
+                    type: object
+                type: object
+              storage:
+                default: 50Gi
+                description: Storage is the storage size
+                type: string
+              windows:
+                items:
+                  properties:
+                    from:
+                      type: string
+                    to:
+                      type: string
+                  required:
+                  - from
+                  - to
+                  type: object
+                type: array
+            type: object
+          status:
+            description: DevSpaceStatus defines the observed state of DevSpace
+            properties:
+              deployStatus:
+                type: string
+              exposeLinks:
+                items:
+                  properties:
+                    link:
+                      type: string
+                    port:
+                      type: integer
+                  type: object
+                type: array
+              link:
+                type: string
+              phase:
+                type: string
+              pods:
+                items:
+                  description: |-
+                    LocalObjectReference contains enough information to let you locate the
+                    referenced object inside the same namespace.
+                  properties:
+                    name:
+                      default: ""
+                      description: |-
+                        Name of the referent.
+                        This field is effectively required, but due to backwards compatibility is
+                        allowed to be empty. Instances of this type with an empty value here are
+                        almost certainly wrong.
+                        TODO: Add other useful fields. apiVersion, kind, uid?
+                        More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                        TODO: Drop `kubebuilder:default` when controller-gen doesn't need it https://github.com/kubernetes-sigs/kubebuilder/issues/3896.
+                      type: string
+                  type: object
+                  x-kubernetes-map-type: atomic
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

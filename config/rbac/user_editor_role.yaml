@@ -1,0 +1,27 @@
+# permissions for end users to edit users.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: kde
+    app.kubernetes.io/managed-by: kustomize
+  name: user-editor-role
+rules:
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - linuxsuren.github.io.github.com
+  resources:
+  - users/status
+  verbs:
+  - get
