@@ -26,12 +26,17 @@ export interface DevSpace {
         services: {
             docker: {
                 enabled: boolean;
+                image: string;
             };
             redis: {
                 enabled: boolean;
+                image: string;
             };
             mysql: {
                 enabled: boolean;
+                image: string;
+                password: string;
+                database: string;
             };
         };
     };
@@ -40,4 +45,39 @@ export interface DevSpace {
         deployStatus: string;
         link: string;
     };
+}
+
+export function NewEmptyDevSpace() {
+    return {
+        metadata: {
+            name: "",
+            namespace: "",
+        },
+        spec: {
+            cpu: "",
+            memory: "",
+            env: {},
+            services: {
+                docker: {
+                    enabled: false,
+                    image: "",
+                },
+                redis: {
+                    enabled: false,
+                    image: "",
+                },
+                mysql: {
+                    enabled: false,
+                },
+            },
+        },
+    } as DevSpace;
+}
+
+export interface Config {
+    storageClassName: string;
+    volumeMode: string;
+    volumeAccessMode: string;
+    ingressMode: string;
+    imagePullPolicy: string;
 }

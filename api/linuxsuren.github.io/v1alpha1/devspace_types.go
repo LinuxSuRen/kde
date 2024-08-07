@@ -51,17 +51,27 @@ type DevSpaceSpec struct {
 }
 
 type Services struct {
-	Docker *Service `json:"docker,omitempty"`
-	MySQL  *Service `json:"mysql,omitempty"`
-	Redis  *Service `json:"redis,omitempty"`
+	Docker *Docker `json:"docker,omitempty"`
+	MySQL  *MySQL  `json:"mysql,omitempty"`
+	Redis  *Redis  `json:"redis,omitempty"`
 }
 
-type Service struct {
-	Name     string `json:"name"`
-	Image    string `json:"image,omitempty"`
+type Docker struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
+type MySQL struct {
 	Enabled  bool   `json:"enabled,omitempty"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
+	Database string `json:"database,omitempty"`
+	Image    string `json:"image,omitempty"`
+}
+
+type Redis struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
 }
 
 type Window struct {

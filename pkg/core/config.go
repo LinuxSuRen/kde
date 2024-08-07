@@ -43,3 +43,7 @@ func ParseConfigAsJSON(data []byte) (config *Config, err error) {
 	err = json.Unmarshal(data, &config)
 	return
 }
+
+func (c *Config) ToJSON() ([]byte, error) {
+	return json.Marshal(c)
+}

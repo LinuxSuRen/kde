@@ -1,8 +1,8 @@
 <template>
     <el-form>
-        <table>
+        <table style="width: 100%;">
             <tr>
-                <td>Namespace/Name:</td>
+                <td style="width: 50%;">Namespace/Name:</td>
                 <td>{{ devspace.metadata.namespace }}/{{ devspace.metadata.name }}</td>
             </tr>
             <tr>
@@ -33,6 +33,15 @@
                     </el-checkbox>
                 </td>
             </tr>
+            <tr v-if="devspace.spec.services.mysql.enabled">
+                <td>
+                    MySQL Password: <el-input v-model="devspace.spec.services.mysql.password" type="password"
+                        style="width: 240px" />
+                </td>
+                <td>
+                    MySQL Database: <el-input v-model="devspace.spec.services.mysql.database" style="width: 240px" />
+                </td>
+            </tr>
         </table>
         <el-button type="primary" @click="submitForm">Submit</el-button>
     </el-form>
@@ -42,10 +51,10 @@
 import { ElMessage } from 'element-plus';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import type { DevSpace } from './types';
+import { NewEmptyDevSpace } from './types';
 
 const route = useRoute();
-const devspace = ref({} as DevSpace)
+const devspace = ref(NewEmptyDevSpace())
 
 fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, {}).
     then(res => res.json()).
@@ -75,7 +84,6 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
     })
 
 const submitForm = () => {
-    console.log(devspace.value.spec)
     fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, {
         method: 'PUT',
         body: JSON.stringify(devspace.value)

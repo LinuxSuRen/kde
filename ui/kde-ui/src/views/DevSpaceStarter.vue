@@ -16,6 +16,12 @@ const devSpaceStatus = ref([] as DevSpaceStatus[])
 const devSpace = ref({} as DevSpace)
 
 const loading = async () => {
+    // make sure this is the current page
+    if (route.path !== '/dev') {
+        clearInterval(autoReload)
+        return
+    }
+
     if (!route.query.name) {
         router.push({
             path: '/dashboard',

@@ -112,6 +112,8 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 	r.GET("/api/instanceStatus", server.InstanceStatus)
 	r.GET("/api/ws/instanceStatus", server.InstanceStatusWS)
 	r.GET("/api/namespaces", server.Namespaces)
+	r.GET("/api/config", server.GetConfig)
+    r.PUT("/api/config", server.UpdateConfig)
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "ok",

@@ -11,6 +11,7 @@
             </template>
         </el-table-column>
         <el-table-column prop="status.link" label="Address" />
+        <el-table-column prop="status.deployStatus" label="Deployment" width="120" />
         <el-table-column prop="status.phase" label="Status" width="80" />
         <el-table-column fixed="right" label="Operations" min-width="80">
             <template #default="scope">
