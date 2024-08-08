@@ -201,6 +201,43 @@ spec:
               name: cache
               subPath: mysql
         {{end}}
+        {{if .Spec.Services.Postgres}}
+        - image: ghcr.io/linuxsuren/library/postgres:16.0
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
+          name: mysql
+          env:
+          - name: POSTGRES_PASSWORD
+            value: {{or .Spec.Services.Postgres.Password "root"}}
+          - name: POSTGRES_DB
+            value: {{or .Spec.Services.Postgres.Database "default"}}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: cache
+              subPath: postgres
+        {{end}}
+        {{if .Spec.Services.TDEngine}}
+        - image: ghcr.io/linuxsuren/tdengine/tdengine:3.3.2.0
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
+          name: taos
+          volumeMounts:
+            - mountPath: /var/lib/taos
+              name: cache
+              subPath: taos
+        {{end}}
+        {{if .Spec.Services.RabbitMQ}}
+        - image: ghcr.io/linuxsuren/library/rabbitmq:3.13.6
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
+          name: mysql
+          env:
+          - name: RABBITMQ_DEFAULT_USER
+            value: {{or .Spec.Services.RabbitMQ.Username "guest"}}
+          - name: RABBITMQ_DEFAULT_PASS
+            value: {{or .Spec.Services.RabbitMQ.Password "guest"}}
+          volumeMounts:
+            - mountPath: /var/lib/rabbitmq
+              name: cache
+              subPath: rabbitmq
+        {{end}}
       securityContext:
         runAsNonRoot: false
       volumes:

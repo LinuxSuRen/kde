@@ -147,7 +147,38 @@ spec:
                       username:
                         type: string
                     type: object
+                  postgres:
+                    properties:
+                      database:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    type: object
+                  rabbitMQ:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    type: object
                   redis:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                    type: object
+                  tdEngine:
                     properties:
                       enabled:
                         type: boolean

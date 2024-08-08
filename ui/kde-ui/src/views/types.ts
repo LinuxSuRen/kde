@@ -38,6 +38,22 @@ export interface DevSpace {
                 password: string;
                 database: string;
             };
+            postgres: {
+                enabled: boolean;
+                image: string;
+                password: string;
+                database: string;
+            };
+            tDEngine: {
+                enabled: boolean;
+                image: string;
+            };
+            rabbitMQ: {
+                enabled: boolean;
+                image: string;
+                username: string;
+                password: string;
+            };
         };
     };
     status: {
@@ -67,6 +83,15 @@ export function NewEmptyDevSpace() {
                     image: "",
                 },
                 mysql: {
+                    enabled: false,
+                },
+                postgres: {
+                    enabled: false,
+                },
+                tDEngine: {
+                    enabled: false,
+                },
+                rabbitMQ: {
                     enabled: false,
                 },
             },

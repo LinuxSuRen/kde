@@ -31,6 +31,15 @@
                     <el-checkbox v-model="devspace.spec.services.redis.enabled">
                         Redis
                     </el-checkbox>
+                    <el-checkbox v-model="devspace.spec.services.postgres.enabled">
+                        Postgres
+                    </el-checkbox>
+                    <el-checkbox v-model="devspace.spec.services.tDEngine.enabled">
+                        TDEngine
+                    </el-checkbox>
+                    <el-checkbox v-model="devspace.spec.services.rabbitMQ.enabled">
+                        RabbitMQ
+                    </el-checkbox>
                 </td>
             </tr>
             <tr v-if="devspace.spec.services.mysql.enabled">
@@ -71,6 +80,21 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
         }
         if (!d.spec.services.redis) {
             d.spec.services.redis = {
+                enabled: false
+            }
+        }
+        if (!d.spec.services.postgres) {
+            d.spec.services.postgres = {
+                enabled: false
+            }
+        }
+        if (!d.spec.services.tDEngine) {
+            d.spec.services.tDEngine = {
+                enabled: false
+            }
+        }
+        if (!d.spec.services.rabbitMQ) {
+            d.spec.services.rabbitMQ = {
                 enabled: false
             }
         }
