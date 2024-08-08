@@ -194,6 +194,12 @@ spec:
           env:
           - name: MYSQL_ROOT_PASSWORD
             value: {{or .Spec.Services.MySQL.Password "root"}}
+          - name: MYSQL_DATABASE
+            value: {{or .Spec.Services.MySQL.Database "default"}}
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: cache
+              subPath: mysql
         {{end}}
       securityContext:
         runAsNonRoot: false
