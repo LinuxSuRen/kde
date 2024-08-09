@@ -31,7 +31,7 @@ interface DevSpace {
     redis: boolean
     postgres: boolean
     tdEngine: boolean
-    rabitMQ: boolean
+    rabbitMQ: boolean
 }
 
 const createDevSpace = async (devSpace: DevSpace) => {
@@ -82,8 +82,8 @@ const createDevSpace = async (devSpace: DevSpace) => {
             enabled: true
         }
     }
-    if (devSpace.rabitMQ) {
-        bodyObj.spec.services.rabitMQ = {
+    if (devSpace.rabbitMQ) {
+        bodyObj.spec.services.rabbitMQ = {
             enabled: true
         }
     }
