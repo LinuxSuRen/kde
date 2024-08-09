@@ -105,4 +105,5 @@ export interface Config {
     volumeAccessMode: string;
     ingressMode: string;
     imagePullPolicy: string;
+    host: string;
 }

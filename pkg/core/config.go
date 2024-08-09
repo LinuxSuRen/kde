@@ -27,6 +27,7 @@ type Config struct {
 	VolumeAccessMode string `json:"volumeAccessMode"`
 	IngressMode      string `json:"ingressMode"`
 	ImagePullPolicy  string `json:"imagePullPolicy"`
+	Host             string `json:"host"`
 }
 
 func ReadConfigFromJSONFile(file string) (config *Config, err error) {

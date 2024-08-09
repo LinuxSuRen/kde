@@ -147,6 +147,9 @@ const updateConfig = () => {
                     </span>
                 </template>
                 <el-form label-width="auto">
+                    <el-form-item label="Host">
+                        <el-input v-model="config.host" />
+                    </el-form-item>
                     <el-form-item label="ImagePullPolicy">
                         <el-select v-model="config.imagePullPolicy">
                             <el-option label="Always" value="Always" />

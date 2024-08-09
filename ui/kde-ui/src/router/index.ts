@@ -29,12 +29,12 @@ const router = createRouter({
         },
         {
             path: "/dashboard",
-            name: "devdashboard",
+            name: "dashboard",
             component: () => import("../views/DevSpaceDashboard.vue"),
         },
         {
-            path: "/install",
-            name: "install",
+            path: "/system",
+            name: "system",
             component: () => import("../views/Installation.vue"),
         },
     ],

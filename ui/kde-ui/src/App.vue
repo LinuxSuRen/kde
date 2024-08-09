@@ -10,7 +10,7 @@ const defaultMenu = ref(window.location.pathname)
         <el-menu-item index="/">Home</el-menu-item>
         <el-menu-item index="/dev">DevSpace</el-menu-item>
         <el-menu-item index="/dashboard">Dashboard</el-menu-item>
-        <el-menu-item index="/install">Installation</el-menu-item>
+        <el-menu-item index="/system">System</el-menu-item>
     </el-menu>
 
     <RouterView />
