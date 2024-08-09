@@ -17,7 +17,6 @@ limitations under the License.
 package main
 
 import (
-	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
@@ -39,18 +38,23 @@ func main() {
 		Short: "A Kubernetes DevSpace manager",
 		Run:   opt.runE,
 	}
-	cmd.Flags().StringVar(&opt.address, "address", ":8080", "The address to listen")
-	cmd.Flags().StringVar(&opt.config, "config", "", "The config file")
-	cmd.Flags().StringVar(&opt.kubeConfig, "kube-config", os.ExpandEnv("$HOME/.kube/config"), "The kube config file")
+	flags := cmd.Flags()
+	flags.StringVar(&opt.address, "address", ":8080", "The address to listen")
+	flags.StringVar(&opt.config, "config", "", "The config file")
+	flags.StringVar(&opt.kubeConfig, "kube-config", os.ExpandEnv("$HOME/.kube/config"), "The kube config file")
+	flags.StringVar(&opt.providerName, "oauth-provider-name", "", "The OAuth provider name")
+	flags.StringVar(&opt.clientID, "oauth-client-id", "", "The OAuth client ID")
+	flags.StringVar(&opt.clientSecret, "oauth-client-secret", "", "The OAuth client secret")
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
 
 type option struct {
-	address    string
-	config     string
-	kubeConfig string
+	address                              string
+	config                               string
+	kubeConfig                           string
+	providerName, clientID, clientSecret string
 }
 
 func (o *option) runE(cmd *cobra.Command, args []string) {
@@ -101,28 +105,24 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 
 	r := gin.Default()
 	apiserver.RegisterStaticFilesHandle(r)
-	r.GET("/api/devspace", server.ListDevSpace)
-	r.POST("/api/devspace", server.CreateDevSpace)
-	r.DELETE("/api/devspace/:devspace", server.DeleteDevSpace)
-	r.PUT("/api/devspace/:devspace", server.UpdateDevSpace)
-	r.GET("/api/devspace/:devspace", server.GetDevSpace)
-	r.GET("/api/languages", server.GetDevSpaceLanguages)
-	r.POST("/api/install", server.Install)
-	r.DELETE("/api/uninstall", server.Uninstall)
-	r.GET("/api/instanceStatus", server.InstanceStatus)
-	r.GET("/api/ws/instanceStatus", server.InstanceStatusWS)
-	r.GET("/api/namespaces", server.Namespaces)
-	r.GET("/api/config", server.GetConfig)
-    r.PUT("/api/config", server.UpdateConfig)
-	r.GET("/healthz", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "ok",
-		})
-	})
-	r.GET("/readyz", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "ok",
-		})
-	})
+	if err = apiserver.RegisterOAuth(r, o.providerName, o.clientID, o.clientSecret); err != nil {
+		return
+	}
+	apiserver.RegisterHealthEndpoint(r)
+
+	authorizedAPI := r.Group("/api", apiserver.OAuthHandler(o.providerName))
+	authorizedAPI.GET("/devspace", server.ListDevSpace)
+	authorizedAPI.POST("/devspace", server.CreateDevSpace)
+	authorizedAPI.DELETE("/devspace/:devspace", server.DeleteDevSpace)
+	authorizedAPI.PUT("/devspace/:devspace", server.UpdateDevSpace)
+	authorizedAPI.GET("/devspace/:devspace", server.GetDevSpace)
+	authorizedAPI.GET("/languages", server.GetDevSpaceLanguages)
+	authorizedAPI.POST("/install", server.Install)
+	authorizedAPI.DELETE("/uninstall", server.Uninstall)
+	authorizedAPI.GET("/instanceStatus", server.InstanceStatus)
+	authorizedAPI.GET("/ws/instanceStatus", server.InstanceStatusWS)
+	authorizedAPI.GET("/namespaces", server.Namespaces)
+	authorizedAPI.GET("/config", server.GetConfig)
+	authorizedAPI.PUT("/config", server.UpdateConfig)
 	r.Run(o.address)
 }
