@@ -6,15 +6,12 @@ const defaultMenu = ref(window.location.pathname)
 </script>
 
 <template>
-    <el-menu
-      mode="horizontal"
-      :default-active="defaultMenu"
-      router>
-      <el-menu-item index="/">Home</el-menu-item>
-      <el-menu-item index="/dev">DevSpace</el-menu-item>
-      <el-menu-item index="/dashboard">Dashboard</el-menu-item>
-      <el-menu-item index="/install">Installation</el-menu-item>
+    <el-menu mode="horizontal" :default-active="defaultMenu" router>
+        <el-menu-item index="/">Home</el-menu-item>
+        <el-menu-item index="/dev">DevSpace</el-menu-item>
+        <el-menu-item index="/dashboard">Dashboard</el-menu-item>
+        <el-menu-item index="/system">System</el-menu-item>
     </el-menu>
 
-    <RouterView/>
+    <RouterView />
 </template>

@@ -54,6 +54,7 @@ spec:
         args:
           - --leader-elect
           - --health-probe-bind-address=:8081
+          - --config=/var/data/config.yaml
         image: ghcr.io/linuxsuren/kde:latest
         name: manager
         securityContext:
@@ -82,5 +83,12 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
+        volumeMounts:
+        - mountPath: /var/data
+          name: config
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
+      volumes:
+      - name: config
+        configMap:
+          name: config

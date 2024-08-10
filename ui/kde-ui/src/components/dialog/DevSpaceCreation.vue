@@ -29,6 +29,9 @@ interface DevSpace {
     docker: boolean
     mysql: boolean
     redis: boolean
+    postgres: boolean
+    tdEngine: boolean
+    rabbitMQ: boolean
 }
 
 const createDevSpace = async (devSpace: DevSpace) => {
@@ -66,6 +69,21 @@ const createDevSpace = async (devSpace: DevSpace) => {
     }
     if (devSpace.redis) {
         bodyObj.spec.services.redis = {
+            enabled: true
+        }
+    }
+    if (devSpace.postgres) {
+        bodyObj.spec.services.postgres = {
+            enabled: true
+        }
+    }
+    if (devSpace.tdEngine) {
+        bodyObj.spec.services.tdEngine = {
+            enabled: true
+        }
+    }
+    if (devSpace.rabbitMQ) {
+        bodyObj.spec.services.rabbitMQ = {
             enabled: true
         }
     }
@@ -138,6 +156,15 @@ const cancelDialog = () => {
                 </el-checkbox>
                 <el-checkbox v-model="ruleForm.redis">
                     Redis
+                </el-checkbox>
+                <el-checkbox v-model="ruleForm.postgres">
+                    Postgres
+                </el-checkbox>
+                <el-checkbox v-model="ruleForm.tdEngine">
+                    TDEngine
+                </el-checkbox>
+                <el-checkbox v-model="ruleForm.rabbitMQ">
+                    RabbitMQ
                 </el-checkbox>
             </el-form-item>
 

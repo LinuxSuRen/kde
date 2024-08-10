@@ -1,13 +1,16 @@
 [{
     "name": "golang",
     "image": "ghcr.io/linuxsuren/openvscode-server-golang:v0.0.8"
-  }, {
-      "name": "nodejs",
-      "image": "ghcr.io/linuxsuren/openvscode-server-nodejs:v0.0.8"
-  }, {
-      "name": "java",
-      "image": "ghcr.io/linuxsuren/openvscode-server-java:v0.0.8"
-  }, {
-      "name": "full",
-      "image": "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
+}, {
+    "name": "nodejs",
+    "image": "ghcr.io/linuxsuren/openvscode-server-nodejs:v0.0.8"
+}, {
+    "name": "java",
+    "image": "ghcr.io/linuxsuren/openvscode-server-java:v0.0.8"
+}, {
+    "name": "moon",
+    "image": "ghcr.io/linuxsuren/openvscode-server-moon:master"
+}, {
+    "name": "full",
+    "image": "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
 }]

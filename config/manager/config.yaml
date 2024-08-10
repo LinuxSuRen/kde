@@ -1,6 +1,7 @@
 apiVersion: v1
 data:
-  sever: http://example.com
+  config.yaml: |
+    imagePullPolicy: IfNotPresent
 kind: ConfigMap
 metadata:
   name: config

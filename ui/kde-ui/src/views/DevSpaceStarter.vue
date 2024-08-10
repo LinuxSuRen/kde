@@ -2,16 +2,10 @@
 import { ElMessageBox } from 'element-plus';
 import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import type { DevSpace } from './types';
 
 const router = useRouter();
 const route = useRoute();
-interface DevSpace {
-    status: {
-        phase: string
-        deployStatus: string
-        link: string
-    }
-}
 
 interface DevSpaceStatus {
     name: string
@@ -22,6 +16,12 @@ const devSpaceStatus = ref([] as DevSpaceStatus[])
 const devSpace = ref({} as DevSpace)
 
 const loading = async () => {
+    // make sure this is the current page
+    if (route.path !== '/dev') {
+        clearInterval(autoReload)
+        return
+    }
+
     if (!route.query.name) {
         router.push({
             path: '/dashboard',

@@ -1,5 +1,5 @@
 /*
-Copyright 2024 kde authrors.
+Copyright 2024 kde authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+    ginhttp "github.com/linuxsuren/kde/pkg/http"
 
 	kdeui "github.com/linuxsuren/kde/ui/kde-ui"
 )
@@ -56,7 +57,7 @@ func handleStaticFilesRequest(c *gin.Context) {
 	}
 }
 
-func RegisterStaticFilesHandle(r *gin.Engine) {
+func RegisterStaticFilesHandle(r ginhttp.GinEngine) {
 	r.GET("/", handleStaticFilesRequest)
 	r.GET("/index.html", handleStaticFilesRequest)
 	r.GET("/favicon.ico", handleStaticFilesRequest)

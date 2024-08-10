@@ -1,5 +1,5 @@
 /*
-Copyright 2024 kde authrors.
+Copyright 2024 kde authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ type Config struct {
 	VolumeAccessMode string `json:"volumeAccessMode"`
 	IngressMode      string `json:"ingressMode"`
 	ImagePullPolicy  string `json:"imagePullPolicy"`
+	Host             string `json:"host"`
 }
 
 func ReadConfigFromJSONFile(file string) (config *Config, err error) {
@@ -42,4 +43,8 @@ func ParseConfigAsJSON(data []byte) (config *Config, err error) {
 	config = &Config{}
 	err = json.Unmarshal(data, &config)
 	return
+}
+
+func (c *Config) ToJSON() ([]byte, error) {
+	return json.Marshal(c)
 }

@@ -75,6 +75,25 @@ spec:
               host:
                 description: Host is the hostname
                 type: string
+              hostAliases:
+                items:
+                  description: |-
+                    HostAlias holds the mapping between IP and hostnames that will be injected as an entry in the
+                    pod's hosts file.
+                  properties:
+                    hostnames:
+                      description: Hostnames for the above IP address.
+                      items:
+                        type: string
+                      type: array
+                      x-kubernetes-list-type: atomic
+                    ip:
+                      description: IP address of the host file entry.
+                      type: string
+                  required:
+                  - ip
+                  type: object
+                type: array
               image:
                 type: string
               initScript:
@@ -114,29 +133,43 @@ spec:
                         type: boolean
                       image:
                         type: string
-                      name:
+                    type: object
+                  mysql:
+                    properties:
+                      database:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
                         type: string
                       password:
                         type: string
                       username:
                         type: string
-                    required:
-                    - name
                     type: object
-                  mysql:
+                  postgres:
+                    properties:
+                      database:
+                        type: string
+                      enabled:
+                        type: boolean
+                      image:
+                        type: string
+                      password:
+                        type: string
+                      username:
+                        type: string
+                    type: object
+                  rabbitMQ:
                     properties:
                       enabled:
                         type: boolean
                       image:
                         type: string
-                      name:
-                        type: string
                       password:
                         type: string
                       username:
                         type: string
-                    required:
-                    - name
                     type: object
                   redis:
                     properties:
@@ -144,14 +177,13 @@ spec:
                         type: boolean
                       image:
                         type: string
-                      name:
+                    type: object
+                  tdEngine:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
                         type: string
-                      password:
-                        type: string
-                      username:
-                        type: string
-                    required:
-                    - name
                     type: object
                 type: object
               storage:

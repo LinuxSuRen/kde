@@ -1,5 +1,5 @@
 /*
-Copyright 2024 kde authrors.
+Copyright 2024 kde authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,23 +44,57 @@ type DevSpaceSpec struct {
 	Repository  *GitRepository    `json:"repository,omitempty"`
 	Auth        DevSpaceAuth      `json:"auth,omitempty"`
 	Environment map[string]string `json:"env,omitempty"`
+	HostAliases []v1.HostAlias    `json:"hostAliases,omitempty"`
 	Windows     []Window          `json:"windows,omitempty"`
 	InitScript  string            `json:"initScript,omitempty"`
 	Services    Services          `json:"services,omitempty"`
 }
 
 type Services struct {
-	Docker *Service `json:"docker,omitempty"`
-	MySQL  *Service `json:"mysql,omitempty"`
-	Redis  *Service `json:"redis,omitempty"`
+	Docker   *Docker   `json:"docker,omitempty"`
+	MySQL    *MySQL    `json:"mysql,omitempty"`
+	Postgres *Postgres `json:"postgres,omitempty"`
+	TDEngine *TDEngine `json:"tdEngine,omitempty"`
+	RabbitMQ *RabbitMQ `json:"rabbitMQ,omitempty"`
+	Redis    *Redis    `json:"redis,omitempty"`
 }
 
-type Service struct {
-	Name     string `json:"name"`
-	Image    string `json:"image,omitempty"`
+type Docker struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
+type MySQL struct {
 	Enabled  bool   `json:"enabled,omitempty"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
+	Database string `json:"database,omitempty"`
+	Image    string `json:"image,omitempty"`
+}
+
+type Postgres struct {
+	Enabled  bool   `json:"enabled,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	Database string `json:"database,omitempty"`
+	Image    string `json:"image,omitempty"`
+}
+
+type RabbitMQ struct {
+	Enabled  bool   `json:"enabled,omitempty"`
+	Username string `json:"username,omitempty"`
+	Password string `json:"password,omitempty"`
+	Image    string `json:"image,omitempty"`
+}
+
+type TDEngine struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
+}
+
+type Redis struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
 }
 
 type Window struct {

@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import { ElNotification } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
+import type { Config } from './types';
 
-const active = ref('Install')
+const tabActive = ref('Install')
+watch(tabActive, () => {
+    if (tabActive.value === 'Install') {
+        loadInstanceStatusData()
+    } else if (tabActive.value === 'Configuration') {
+        loadConfig()
+    }
+})
 
 const installForm = reactive({
     namespace: '',
@@ -27,7 +35,7 @@ const namespaceList = ref({
 })
 fetch('/api/namespaces', {
     method: 'GET'
-}).then(res => {return res.json()}).then(d => {
+}).then(res => { return res.json() }).then(d => {
     namespaceList.value = d
 })
 
@@ -70,34 +78,50 @@ const uninstall = () => {
         }
     }).finally(loadInstanceStatusData)
 }
+
+const config = ref({} as Config)
+const loadConfig = () => {
+    fetch(`/api/config`, {}).then(res => res.json()).then(d => {
+        config.value = d
+    })
+}
+const updateConfig = () => {
+    fetch(`/api/config`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(config.value)
+    }).then(res => {
+        if (res.status === 200) {
+            ElNotification({
+                title: 'Update successful',
+                type: 'success',
+            })
+        } else {
+            ElNotification({
+                title: 'Update failed',
+                type: 'error',
+            })
+        }
+    })
+}
 </script>
 
 <template>
-    <div style="height: 300px">
-        <el-tabs type="border-card" v-model="active">
+    <div>
+        <el-tabs type="border-card" v-model="tabActive">
             <el-tab-pane name="Install">
                 <template #label>
                     <span>Install</span>
                 </template>
 
-                <el-form
-                    :model="installForm"
-                    label-width="auto"
-                >
+                <el-form :model="installForm" label-width="auto">
                     <el-form-item label="Namespace" prop="namespace">
-                        <el-select
-                            v-model="installForm.namespace"
-                            clearable
-                            placeholder="Select"
-                            style="width: 240px"
-                            >
-                            <el-option
-                                v-for="item in namespaceList.items"
-                                :key="item.metadata.name"
-                                :label="item.metadata.name"
-                                :value="item.metadata.name"
-                            />
-                            </el-select>
+                        <el-select v-model="installForm.namespace" clearable placeholder="Select" style="width: 240px">
+                            <el-option v-for="item in namespaceList.items" :key="item.metadata.name"
+                                :label="item.metadata.name" :value="item.metadata.name" />
+                        </el-select>
                     </el-form-item>
                 </el-form>
 
@@ -113,7 +137,7 @@ const uninstall = () => {
                 <div>
                     <el-button type="primary" @click="install">Install</el-button>
                     <el-button type="danger" @click="uninstall">Uninstall</el-button>
-                    <el-button type="primary" @click="active='Configuration'">Next</el-button>
+                    <el-button type="primary" @click="tabActive = 'Configuration'">Next</el-button>
                 </div>
             </el-tab-pane>
             <el-tab-pane name="Configuration">
@@ -122,7 +146,33 @@ const uninstall = () => {
                         <span>Configuration</span>
                     </span>
                 </template>
-                Configuration
+                <el-form label-width="auto">
+                    <el-form-item label="Host">
+                        <el-input v-model="config.host" />
+                    </el-form-item>
+                    <el-form-item label="ImagePullPolicy">
+                        <el-select v-model="config.imagePullPolicy">
+                            <el-option label="Always" value="Always" />
+                            <el-option label="Never" value="Never" />
+                            <el-option label="IfNotPresent" value="IfNotPresent" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="IngressMode">
+                        <el-input v-model="config.ingressMode" />
+                    </el-form-item>
+                    <el-form-item label="VolumeAccessMode">
+                        <el-input v-model="config.volumeAccessMode" />
+                    </el-form-item>
+                    <el-form-item label="VolumeMode">
+                        <el-input v-model="config.volumeMode" />
+                    </el-form-item>
+                    <el-form-item label="StorageClassName">
+                        <el-input v-model="config.storageClassName" />
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="updateConfig">Submit</el-button>
+                    </el-form-item>
+                </el-form>
             </el-tab-pane>
         </el-tabs>
     </div>
