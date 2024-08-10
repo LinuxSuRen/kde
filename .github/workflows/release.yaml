@@ -10,6 +10,7 @@ on:
 env:
   REGISTRY: ghcr.io
   REGISTRY_DOCKERHUB: docker.io
+  REGISTRY_ALIYUN: registry.aliyuncs.com
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -40,6 +41,13 @@ jobs:
           registry: ${{ env.REGISTRY_DOCKERHUB }}
           username: linuxsuren
           password: ${{ secrets.DOCKER_HUB_PUBLISH_SECRETS }}
+      - name: Log into registry ${{ env.REGISTRY_ALIYUN }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.REGISTRY_ALIYUN }}
+          username: ${{ secrets.REGISTRY_ALIYUN_USER }}
+          password: ${{ secrets.REGISTRY_ALIYUN_PUBLISH_SECRETS }}
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
@@ -47,6 +55,7 @@ jobs:
           images: |
             ${{ env.REGISTRY }}/linuxsuren/api-testing
             ${{ env.REGISTRY_DOCKERHUB }}/${{ env.IMAGE_NAME }}
+            ${{ env.REGISTRY_ALIYUN }}/${{ env.IMAGE_NAME }}
       - name: Build and push Docker image
         id: build-and-push
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
