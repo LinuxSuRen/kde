@@ -202,6 +202,14 @@ type InstanceStatus struct {
 	Status    string `json:"status"`
 }
 
+func (s *Server) ServerImages(c *gin.Context) {
+	images := []string{
+		"ghcr.io/linuxsuren/kde:latest",
+		"registry.aliyuncs.com/linuxsuren/kde:latest",
+	}
+	c.JSON(http.StatusOK, images)
+}
+
 func (s *Server) InstanceStatus(c *gin.Context) {
 	ctx := c.Request.Context()
 	namespace := c.DefaultQuery("namespace", "default")
