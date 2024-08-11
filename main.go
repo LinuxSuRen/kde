@@ -123,6 +123,7 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 	authorizedAPI.GET("/instanceStatus", server.InstanceStatus)
 	authorizedAPI.GET("/ws/instanceStatus", server.InstanceStatusWS)
 	authorizedAPI.GET("/namespaces", server.Namespaces)
+	authorizedAPI.GET("/images", server.Images)
 	authorizedAPI.GET("/config", server.GetConfig)
 	authorizedAPI.PUT("/config", server.UpdateConfig)
 	r.Run(o.address)

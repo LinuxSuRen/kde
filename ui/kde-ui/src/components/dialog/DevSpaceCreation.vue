@@ -50,7 +50,7 @@ const createDevSpace = async (devSpace: DevSpace) => {
               "spec": {
                 "cpu": "${devSpace.cpu}",
                 "memory": "${devSpace.memory}",
-                "host": "dev-center.jenkins-zh.cn",
+                "host": "devspace.jenkins-zh.cn",
                 "image": "${devSpace.image}",
                 "services": {}
               }
