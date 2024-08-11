@@ -22,12 +22,13 @@ import (
 )
 
 type Config struct {
-	StorageClassName string `json:"storageClassName"`
-	VolumeMode       string `json:"volumeMode"`
-	VolumeAccessMode string `json:"volumeAccessMode"`
-	IngressMode      string `json:"ingressMode"`
-	ImagePullPolicy  string `json:"imagePullPolicy"`
-	Host             string `json:"host"`
+	StorageClassName string            `json:"storageClassName"`
+	VolumeMode       string            `json:"volumeMode"`
+	VolumeAccessMode string            `json:"volumeAccessMode"`
+	IngressMode      string            `json:"ingressMode"`
+	ImagePullPolicy  string            `json:"imagePullPolicy"`
+	Host             string            `json:"host"`
+	Languages        map[string]string `json:"languages"`
 }
 
 func ReadConfigFromJSONFile(file string) (config *Config, err error) {

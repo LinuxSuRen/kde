@@ -117,6 +117,7 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 	authorizedAPI.PUT("/devspace/:devspace", server.UpdateDevSpace)
 	authorizedAPI.GET("/devspace/:devspace", server.GetDevSpace)
 	authorizedAPI.GET("/languages", server.GetDevSpaceLanguages)
+	authorizedAPI.GET("/serverImages", server.ServerImages)
 	authorizedAPI.POST("/install", server.Install)
 	authorizedAPI.DELETE("/uninstall", server.Uninstall)
 	authorizedAPI.GET("/instanceStatus", server.InstanceStatus)

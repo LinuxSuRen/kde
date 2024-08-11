@@ -66,7 +66,7 @@ func RegisterOAuth(r ginhttp.GinEngine, providerName, clientID, clientSecret str
 func OAuthHandler(provider string) func(*gin.Context) {
 	// auth is disabled
 	if provider == "" {
-		return nil
+		return func(c *gin.Context) {}
 	}
 
 	return func(c *gin.Context) {
