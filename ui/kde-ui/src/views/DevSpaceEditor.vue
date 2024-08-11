@@ -18,6 +18,12 @@
                 </td>
             </tr>
             <tr>
+                <td>Image</td>
+                <td>
+                    <el-input v-model="devspace.spec.image" />
+                </td>
+            </tr>
+            <tr>
                 <td>
                     Services:
                 </td>
