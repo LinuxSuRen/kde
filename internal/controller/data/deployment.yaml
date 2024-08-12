@@ -14,7 +14,7 @@ metadata:
       name: {{.ObjectMeta.Name}}
       uid: {{.ObjectMeta.UID}}
 spec:
-  {{ if eq .Status.Phase "Off" }}
+  {{ if or (eq .Status.Phase "Off") (not .Spec.Replicas) }}
   replicas: 0
   {{else}}
   replicas: {{.Spec.Replicas}}

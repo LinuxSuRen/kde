@@ -166,7 +166,8 @@ func TestGitPodController(t *testing.T) {
 	noMaintainMode.Annotations = nil
 
 	zeroReplicas := createDefaultGitPod().DeepCopy()
-	zeroReplicas.Spec.Replicas = 0
+	// set the default value of below
+	zeroReplicas.Spec.Replicas = new(int32)
 	zeroReplicas.Spec.Windows = nil
 
 	type fields struct {
