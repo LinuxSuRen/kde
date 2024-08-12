@@ -209,7 +209,7 @@ spec:
         {{if .Spec.Services.Postgres}}
         - image: ghcr.io/linuxsuren/library/postgres:16.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
-          name: mysql
+          name: postgres
           env:
           - name: POSTGRES_PASSWORD
             value: {{or .Spec.Services.Postgres.Password "root"}}
@@ -232,7 +232,7 @@ spec:
         {{if .Spec.Services.RabbitMQ}}
         - image: ghcr.io/linuxsuren/library/rabbitmq:3.13.6
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
-          name: mysql
+          name: rabbitmq
           env:
           - name: RABBITMQ_DEFAULT_USER
             value: {{or .Spec.Services.RabbitMQ.Username "guest"}}
