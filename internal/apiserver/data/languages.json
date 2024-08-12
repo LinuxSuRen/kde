@@ -1,16 +1,19 @@
 [{
     "name": "golang",
-    "image": "ghcr.io/linuxsuren/openvscode-server-golang:v0.0.8"
+    "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-golang:v0.0.10"
 }, {
     "name": "nodejs",
-    "image": "ghcr.io/linuxsuren/openvscode-server-nodejs:v0.0.8"
+    "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-nodejs:v0.0.10"
 }, {
     "name": "java",
-    "image": "ghcr.io/linuxsuren/openvscode-server-java:v0.0.8"
+    "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-java:v0.0.10"
 }, {
     "name": "moon",
-    "image": "ghcr.io/linuxsuren/openvscode-server-moon:master"
+    "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-moon:v0.0.10"
+}, {
+    "name": "rust",
+    "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-rust:v0.0.10"
 }, {
     "name": "full",
-    "image": "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
+    "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-full:v0.0.10"
 }]

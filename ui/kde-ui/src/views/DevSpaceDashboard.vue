@@ -22,6 +22,10 @@
                     @click.prevent="editDevSpace(scope.row.metadata.namespace, scope.row.metadata.name)">
                     Edit
                 </el-button>
+                <el-button link type="primary" size="small"
+                    @click.prevent="restartDevSpace(scope.row.metadata.namespace, scope.row.metadata.name)">
+                    Restart
+                </el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -75,6 +79,13 @@ const deleteRow = (index: number) => {
 const editDevSpace = (namespace: string, name: string) => {
     router.push({
         path: `/devspace/${namespace}/${name}`,
+    })
+}
+const restartDevSpace = (namespace: string, name: string) => {
+    fetch(`/api/devspace/${name}/restart?namespace=${namespace}`, {
+        method: 'PUT'
+    }).finally(() => {
+        loadData()
     })
 }
 

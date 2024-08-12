@@ -38,7 +38,7 @@ type DevSpaceSpec struct {
 	Image   string `json:"image,omitempty"`
 	// Replicas is the number of replicas
 	// +kubebuilder:default:replicas=1
-	Replicas int32 `json:"replicas,omitempty"`
+	Replicas *int32 `json:"replicas,omitempty"`
 	// Host is the hostname
 	Host        string            `json:"host,omitempty"`
 	Repository  *GitRepository    `json:"repository,omitempty"`

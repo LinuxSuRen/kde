@@ -21,6 +21,7 @@ import (
 	_ "embed"
 
 	"github.com/linuxsuren/kde/pkg/core"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestParseConfigAsJSON(t *testing.T) {
@@ -50,9 +51,7 @@ func TestParseConfigAsJSON(t *testing.T) {
 				t.Errorf("ParseConfigAsJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if *got != tt.want {
-				t.Errorf("ParseConfigAsJSON() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, *got, tt.want)
 		})
 	}
 }
@@ -77,9 +76,7 @@ func TestReadConfigFromJSONFile(t *testing.T) {
 				t.Errorf("ReadConfigFromJSONFile() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if *got != tt.want {
-				t.Errorf("ReadConfigFromJSONFile() = %v, want %v", got, tt.want)
-			}
+			assert.Equal(t, *got, tt.want)
 
 			_, err = got.ToJSON()
 			if err != nil {

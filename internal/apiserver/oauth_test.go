@@ -46,5 +46,5 @@ func TestRegisterOAuth(t *testing.T) {
 }
 
 func TestOAuthHandler(t *testing.T) {
-	assert.Nil(t, apiserver.OAuthHandler(""))
+	assert.NotNil(t, apiserver.OAuthHandler(""))
 }

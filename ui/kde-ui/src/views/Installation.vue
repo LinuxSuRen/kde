@@ -14,6 +14,7 @@ watch(tabActive, () => {
 
 const installForm = reactive({
     namespace: '',
+    image: '',
 })
 
 const instanceStatusData = ref()
@@ -39,14 +40,20 @@ fetch('/api/namespaces', {
     namespaceList.value = d
 })
 
+const imageList = ref([])
+fetch('/api/images', {}).then(res => { return res.json() }).then(d => {
+    imageList.value = d
+})
+
 watch(() => installForm.namespace, loadInstanceStatusData)
 
 const install = () => {
-    fetch(`/api/install?namespace=${installForm.namespace}`, {
+    fetch(`/api/install`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(installForm),
     }).then(res => {
         if (res.status === 200) {
             ElNotification({
@@ -116,11 +123,17 @@ const updateConfig = () => {
                     <span>Install</span>
                 </template>
 
-                <el-form :model="installForm" label-width="auto">
+                <el-form :model="installForm" label-width="auto" inline>
                     <el-form-item label="Namespace" prop="namespace">
                         <el-select v-model="installForm.namespace" clearable placeholder="Select" style="width: 240px">
                             <el-option v-for="item in namespaceList.items" :key="item.metadata.name"
                                 :label="item.metadata.name" :value="item.metadata.name" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="Image" prop="image">
+                        <el-select v-model="installForm.image" style="width: 400px">
+                            <el-option v-for="item in imageList" :key="item"
+                                :label="item" :value="item" />
                         </el-select>
                     </el-form-item>
                 </el-form>

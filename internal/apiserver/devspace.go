@@ -17,6 +17,7 @@ limitations under the License.
 package apiserver
 
 import (
+	"context"
 	"embed"
 	"encoding/json"
 	"net/http"
@@ -106,6 +107,38 @@ func (s *Server) UpdateDevSpace(c *gin.Context) {
 			c.JSON(http.StatusOK, result)
 		}
 	}
+}
+
+func (s *Server) RestartDevSpace(c *gin.Context) {
+	name := c.Params.ByName("devspace")
+	namespace := getNamespaceFromQuery(c)
+
+	err := s.updateReplicas(c.Request.Context(), namespace, name, 0)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	err = s.updateReplicas(c.Request.Context(), namespace, name, 1)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusOK, "")
+}
+
+func (s *Server) updateReplicas(ctx context.Context, namespace, name string, replicas int32) (err error) {
+	var devSpace *v1alpha1.DevSpace
+	devSpace, err = s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return
+	}
+
+	devSpace.Spec.Replicas = &replicas
+	_, err = s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Update(ctx, devSpace, metav1.UpdateOptions{})
+	return
 }
 
 func (s *Server) GetDevSpace(c *gin.Context) {

@@ -23,6 +23,9 @@ export interface DevSpace {
         cpu: string;
         memory: string;
         env: {};
+        host: string;
+        image: string;
+        storage: string;
         services: {
             docker: {
                 enabled: boolean;
@@ -73,6 +76,9 @@ export function NewEmptyDevSpace() {
             cpu: "",
             memory: "",
             env: {},
+            host: "",
+            image: "",
+            storage: "",
             services: {
                 docker: {
                     enabled: false,

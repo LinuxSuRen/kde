@@ -48,10 +48,25 @@ func getNamespaceFromQuery(querier Querier) string {
 	return namespace
 }
 
+type installRequest struct {
+	Image     string `json:"image"`
+	Namespace string `json:"namespace"`
+}
+
 func (s *Server) Install(c *gin.Context) {
 	ctx := c.Request.Context()
-	namespace := getNamespaceFromQuery(c)
+	installReq := &installRequest{}
+	err := c.BindJSON(&installReq)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
 
+	namespace := installReq.Namespace
+	if namespace == "" {
+		namespace = "default"
+	}
 	crdDevSpace := getCRD("linuxsuren.github.io_devspaces.yaml")
 	_, crdDevSpaceErr := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, crdDevSpace, metav1.CreateOptions{})
 
@@ -68,10 +83,16 @@ func (s *Server) Install(c *gin.Context) {
 
 	deploy := getDeployment("manager.yaml")
 	deploy.SetNamespace(namespace)
+	if installReq.Image != "" {
+		deploy.Spec.Template.Spec.Containers[0].Image = installReq.Image
+	}
 	_, deployErr := s.Client.AppsV1().Deployments(namespace).Create(ctx, deploy, metav1.CreateOptions{})
 
 	apiserverDeploy := getDeployment("apiserver-deploy.yaml")
 	apiserverDeploy.SetNamespace(namespace)
+	if installReq.Image != "" {
+		apiserverDeploy.Spec.Template.Spec.Containers[0].Image = installReq.Image
+	}
 	_, apiserverDeployErr := s.Client.AppsV1().Deployments(namespace).Create(ctx, apiserverDeploy, metav1.CreateOptions{})
 
 	service := getService("apiserver-service.yaml")
@@ -82,7 +103,7 @@ func (s *Server) Install(c *gin.Context) {
 	ingress.SetNamespace(namespace)
 	_, ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Create(ctx, ingress, metav1.CreateOptions{})
 
-	err := errors.Join(client.IgnoreAlreadyExists(crdDevSpaceErr), client.IgnoreAlreadyExists(crdUserErr),
+	err = errors.Join(client.IgnoreAlreadyExists(crdDevSpaceErr), client.IgnoreAlreadyExists(crdUserErr),
 		client.IgnoreAlreadyExists(saErr), client.IgnoreAlreadyExists(cmErr),
 		client.IgnoreAlreadyExists(deployErr), client.IgnoreAlreadyExists(apiserverDeployErr),
 		client.IgnoreAlreadyExists(serviceErr), client.IgnoreAlreadyExists(ingressErr))
@@ -343,4 +364,12 @@ func (s *Server) Namespaces(c *gin.Context) {
 	} else {
 		c.JSON(http.StatusOK, nsList)
 	}
+}
+
+func (s *Server) Images(c *gin.Context) {
+	c.JSON(http.StatusOK, []string{
+		"ghcr.io/linuxsuren/kde:latest",
+		"registry.aliyuncs.com/linuxsuren/kde:latest",
+		"docker.io/linuxsuren/kde:latest",
+	})
 }

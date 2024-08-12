@@ -213,7 +213,7 @@ func (r *DevSpaceReconciler) updateStatus(devSpace *v1alpha1.DevSpace) *v1alpha1
 	r.log.Info("check alive window", "enable", hasWin, "in", ok, "now", time.Now().Format(time.TimeOnly))
 
 	// check if all the pods are deleted
-	if devSpace.Status.Phase != v1alpha1.DevSpacePhaseOff && devSpace.Spec.Replicas <= 0 {
+	if devSpace.Status.Phase != v1alpha1.DevSpacePhaseOff && devSpace.Spec.Replicas != nil && *(devSpace.Spec.Replicas) <= 0 {
 		podList := &corev1.PodList{}
 		listErr := r.List(r.ctx, podList, client.MatchingLabels{LabelApp: devSpace.Name})
 		if listErr == nil {
