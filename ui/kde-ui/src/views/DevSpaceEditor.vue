@@ -18,6 +18,18 @@
                 </td>
             </tr>
             <tr>
+                <td>Storage</td>
+                <td>
+                    <el-input v-model="devspace.spec.storage" />
+                </td>
+            </tr>
+            <tr>
+                <td>Host</td>
+                <td>
+                    <el-input v-model="devspace.spec.host" />
+                </td>
+            </tr>
+            <tr>
                 <td>Image</td>
                 <td>
                     <el-input v-model="devspace.spec.image" />

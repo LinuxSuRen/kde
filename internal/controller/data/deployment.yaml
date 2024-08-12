@@ -67,15 +67,18 @@ spec:
               cd /home/workspace
               cp /usr/local/* /usr/local-bak -r -n
               chmod 1777 /tmp
-              [[ -d "/home/workspace-bak/.cache" ]] && [[ ! -d "/home/workspace/.cache" ]] && cp /home/workspace-bak/.cache /home/workspace -a -r -n
-              [[ -d "/home/workspace-bak/.local" ]] && [[ ! -d "/home/workspace/.local" ]] && cp /home/workspace-bak/.local /home/workspace -a -r -n
-              [[ -d "/home/workspace-bak/.oh-my-zsh" ]] && [[ ! -d "/home/workspace/.oh-my-zsh" ]] && cp /home/workspace-bak/.oh-my-zsh /home/workspace -a -r -n
-              [[ -d "/home/workspace-bak/.openvscode-server" ]] && [[ ! -d "/home/workspace/.openvscode-server" ]] && cp /home/workspace-bak/.openvscode-server /home/workspace -a -r -n
-              [[ -d "/home/workspace-bak/.sdkman" ]] && [[ ! -d "/home/workspace/.sdkman" ]] && cp /home/workspace-bak/.sdkman /home/workspace -a -r -n
-              [[ -e "/home/workspace-bak/.bashrc" ]] && [[ ! -e "/home/workspace/.bashrc" ]] && cp /home/workspace-bak/.bashrc /home/workspace
-              [[ -e "/home/workspace-bak/.zshrc" ]] && [[ ! -e "/home/workspace/.zshrc" ]] && cp /home/workspace-bak/.zshrc /home/workspace
-              [[ -e "/home/workspace-bak/moon-back" ]] && [[ ! -e "/home/workspace/.moon" ]] && cp /home/workspace-bak/moon-back /home/workspace/.moon
-              [[ -e "/home/workspace-bak/.rust" ]] && [[ ! -e "/home/workspace/.rust" ]] && cp /home/workspace-bak/.rust /home/workspace/.rust
+              [[ -d "/var/data/.cache" ]] && [[ ! -d "/home/workspace/.cache" ]] && cp /var/data/.cache /home/workspace -a -r -n
+              [[ -d "/var/data/.local" ]] && [[ ! -d "/home/workspace/.local" ]] && cp /var/data/.local /home/workspace -a -r -n
+              [[ -d "/var/data/.oh-my-zsh" ]] && [[ ! -d "/home/workspace/.oh-my-zsh" ]] && cp /var/data/.oh-my-zsh /home/workspace -a -r -n
+              [[ -d "/var/data/.openvscode-server" ]] && [[ ! -d "/home/workspace/.openvscode-server" ]] && cp /var/data/.openvscode-server /home/workspace -a -r -n
+              [[ -d "/var/data/.sdkman" ]] && [[ ! -d "/home/workspace/.sdkman" ]] && cp /var/data/.sdkman /home/workspace/ -a -r -n
+              [[ -d "/var/data/.moon" ]] && [[ ! -d "/home/workspace/.moon" ]] && cp /var/data/.moon /home/workspace/ -a -r -n
+              [[ -d "/var/data/.cargo" ]] && [[ ! -d "/home/workspace/.cargo" ]] && cp /var/data/.cargo /home/workspace/ -a -r -n
+              [[ -d "/var/data/.rustup" ]] && [[ ! -d "/home/workspace/.rustup" ]] && cp /var/data/.rustup /home/workspace/ -a -r -n
+              [[ -d "/var/data/go" ]] && [[ ! -d "/home/workspace/go" ]] && cp /var/data/go /home/workspace/ -a -r -n
+              [[ -e "/var/data/.bashrc" ]] && [[ ! -e "/home/workspace/.bashrc" ]] && cp /var/data/.bashrc /home/workspace
+              [[ -e "/var/data/.zshrc" ]] && [[ ! -e "/home/workspace/.zshrc" ]] && cp /var/data/.zshrc /home/workspace
+              [[ -e "/var/data/.profile" ]] && [[ ! -e "/home/workspace/.profile" ]] && cp /var/data/.profile /home/workspace
               [[ -e "/var/data/openvscode-server-back/data/Machine/settings.json" ]] && [[ ! -e "/home/workspace/.openvscode-server/data/Machine/settings.json" ]] && \
                   mkdir -p /home/workspace/.openvscode-server/data/Machine && \
                   cp /var/data/openvscode-server-back/data/Machine/settings.json /home/workspace/.openvscode-server/data/Machine/settings.json
