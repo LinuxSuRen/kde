@@ -79,4 +79,5 @@ jobs:
           go-version: 1.22
       - name: Test
         run: |
+          mkdir -p ui/kde-ui/dist
           make unit
