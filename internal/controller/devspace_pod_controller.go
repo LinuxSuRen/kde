@@ -35,6 +35,7 @@ type DevSpacePodPodReconciler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=pods,verbs=get;list
+// +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list
 
 func (r *DevSpacePodPodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (result ctrl.Result, err error) {
 	r.ctx = ctx
@@ -53,11 +54,11 @@ func (r *DevSpacePodPodReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 		return
 	}
 
-	gitpod := &v1alpha1.DevSpace{}
+	devspace := &v1alpha1.DevSpace{}
 	if err = r.Get(r.ctx, types.NamespacedName{
 		Name:      repoName,
 		Namespace: pod.Namespace,
-	}, gitpod); err != nil {
+	}, devspace); err != nil {
 		err = client.IgnoreNotFound(err)
 		return
 	}
@@ -70,22 +71,22 @@ func (r *DevSpacePodPodReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 	}
 
 	podCount := len(pods.Items)
-	gitpod.Status.DeployStatus = ""
-	gitpod.Status.Pods = make([]v1.LocalObjectReference, podCount)
+	devspace.Status.DeployStatus = ""
+	devspace.Status.Pods = make([]v1.LocalObjectReference, podCount)
 	for i, p := range pods.Items {
-		gitpod.Status.Pods[i] = v1.LocalObjectReference{Name: p.Name}
+		devspace.Status.Pods[i] = v1.LocalObjectReference{Name: p.Name}
 		if p.Status.Phase == v1.PodRunning {
-			gitpod.Status.DeployStatus = string(v1.PodRunning)
+			devspace.Status.DeployStatus = string(v1.PodRunning)
 		}
 	}
-	if gitpod.Status.DeployStatus == "" && podCount > 0 {
-		gitpod.Status.DeployStatus = string(pods.Items[0].Status.Phase)
+	if devspace.Status.DeployStatus == "" && podCount > 0 {
+		devspace.Status.DeployStatus = string(pods.Items[0].Status.Phase)
 	}
-	err = r.Status().Update(r.ctx, gitpod)
+	err = r.Status().Update(r.ctx, devspace)
 	return
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *DevSpacePodPodReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return setupWithManagerAndLabels(mgr, &v1.Pod{}, map[string]string{LabelAppKind: "gitpod"}, r)
+	return setupWithManagerAndLabels(mgr, &v1.Pod{}, map[string]string{LabelAppKind: "devspace"}, r)
 }

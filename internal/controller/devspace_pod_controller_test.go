@@ -85,7 +85,8 @@ func TestGitPodPodController(t *testing.T) {
 	}, {
 		name: "normal",
 		fields: fields{
-			Client: fake.NewClientBuilder().WithScheme(schema).WithObjects(defaultPod.DeepCopy(), createDefaultGitPod().DeepCopy()).Build(),
+			Client: fake.NewClientBuilder().WithScheme(schema).WithObjects(defaultPod.DeepCopy(),
+				createDefaultGitPod().DeepCopy()).WithStatusSubresource(createDefaultGitPod().DeepCopy()).Build(),
 		},
 		req: defaultRequest,
 		verify: func(t *testing.T, r ctrl.Result, Client client.Client, err error) {
@@ -99,7 +100,8 @@ func TestGitPodPodController(t *testing.T) {
 	}, {
 		name: "pending status",
 		fields: fields{
-			Client: fake.NewClientBuilder().WithScheme(schema).WithObjects(pendingPhasePod.DeepCopy(), createDefaultGitPod().DeepCopy()).Build(),
+			Client: fake.NewClientBuilder().WithScheme(schema).WithObjects(pendingPhasePod.DeepCopy(),
+				createDefaultGitPod().DeepCopy()).WithStatusSubresource(createDefaultGitPod().DeepCopy()).Build(),
 		},
 		req: defaultRequest,
 		verify: func(t *testing.T, r ctrl.Result, Client client.Client, err error) {

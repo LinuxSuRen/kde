@@ -25,7 +25,7 @@ spec:
       - command:
         - /server
         args:
-        - --config=/var/data/config.yaml
+        - --config=/var/data/config.json
         image: ghcr.io/linuxsuren/kde:latest
         name: server
         securityContext:

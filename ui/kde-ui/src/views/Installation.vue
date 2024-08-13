@@ -88,12 +88,21 @@ const uninstall = () => {
 
 const config = ref({} as Config)
 const loadConfig = () => {
-    fetch(`/api/config`, {}).then(res => res.json()).then(d => {
+    fetch(`/api/config?namespace=${installForm.namespace}`, {}).then(res => {
+        if (res.status !== 200) {
+            ElNotification({
+                title: 'Failed to load config',
+                type: 'error',
+            })
+        } else {
+            return res.json()
+        }
+    }).then(d => {
         config.value = d
     })
 }
 const updateConfig = () => {
-    fetch(`/api/config`, {
+    fetch(`/api/config?namespace=${installForm.namespace}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -125,15 +134,15 @@ const updateConfig = () => {
 
                 <el-form :model="installForm" label-width="auto" inline>
                     <el-form-item label="Namespace" prop="namespace">
-                        <el-select v-model="installForm.namespace" clearable placeholder="Select" style="width: 240px">
+                        <el-select v-model="installForm.namespace" clearable placeholder="Select" filterable
+                            style="width: 240px">
                             <el-option v-for="item in namespaceList.items" :key="item.metadata.name"
                                 :label="item.metadata.name" :value="item.metadata.name" />
                         </el-select>
                     </el-form-item>
                     <el-form-item label="Image" prop="image">
                         <el-select v-model="installForm.image" style="width: 400px">
-                            <el-option v-for="item in imageList" :key="item"
-                                :label="item" :value="item" />
+                            <el-option v-for="item in imageList" :key="item" :label="item" :value="item" />
                         </el-select>
                     </el-form-item>
                 </el-form>

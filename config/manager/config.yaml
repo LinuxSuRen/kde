@@ -1,8 +1,12 @@
 apiVersion: v1
 data:
-  config.yaml: |
-    imagePullPolicy: IfNotPresent
+  config.json: |
+    {
+      "host": "devspace.jenkins-zh.cn"
+    }
 kind: ConfigMap
 metadata:
   name: config
   namespace: default
+  labels:
+    linuxsuren.github.io/application_kind: devspace

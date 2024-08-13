@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    linuxsuren.github.io/application_kind: gitpod
+    linuxsuren.github.io/application_kind: devspace
     linuxsuren.github.io/application: {{.ObjectMeta.Name}}
   name: {{.ObjectMeta.Name}}
   namespace: {{.ObjectMeta.Namespace}}
@@ -21,7 +21,7 @@ spec:
   {{ end }}
   selector:
     matchLabels:
-      linuxsuren.github.io/application_kind: gitpod
+      linuxsuren.github.io/application_kind: devspace
       linuxsuren.github.io/application: {{.ObjectMeta.Name}}
   strategy:
     rollingUpdate:
@@ -31,7 +31,7 @@ spec:
   template:
     metadata:
       labels:
-        linuxsuren.github.io/application_kind: gitpod
+        linuxsuren.github.io/application_kind: devspace
         linuxsuren.github.io/application: {{.ObjectMeta.Name}}
     spec:
       affinity:
@@ -40,7 +40,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  linuxsuren.github.io/application_kind: gitpod
+                  linuxsuren.github.io/application_kind: devspace
                   linuxsuren.github.io/application: {{.ObjectMeta.Name}}
               topologyKey: kubernetes.io/hostname
             weight: 5
@@ -125,8 +125,8 @@ spec:
           {{ end }}
           resources:
             requests:
-              cpu: 50m
-              memory: 50Mi
+              cpu: {{.Spec.CPU}}
+              memory: {{.Spec.Memory}}
             limits:
               cpu: {{.Spec.CPU}}
               memory: {{.Spec.Memory}}
@@ -162,7 +162,7 @@ spec:
               subPath: docker
             - mountPath: /var/run
               name: container-runtime
-        {{if .Spec.Services.Docker}}
+        {{if and .Spec.Services.Docker .Spec.Services.Docker.Enabled}}
         - image: ghcr.io/linuxsuren/library/docker:27.0.3-dind
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: docker
@@ -187,12 +187,12 @@ spec:
             - mountPath: /etc/docker
               name: config
         {{end}}
-        {{if .Spec.Services.Redis}}
+        {{if and .Spec.Services.Redis .Spec.Services.Redis.Enabled}}
         - image: ghcr.io/linuxsuren/library/redis:7.0.14
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: redis
         {{end}}
-        {{if .Spec.Services.MySQL}}
+        {{if and .Spec.Services.MySQL .Spec.Services.MySQL.Enabled}}
         - image: ghcr.io/linuxsuren/library/mysql:8.2.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: mysql
@@ -206,10 +206,10 @@ spec:
               name: cache
               subPath: mysql
         {{end}}
-        {{if .Spec.Services.Postgres}}
+        {{if and .Spec.Services.Postgres .Spec.Services.Postgres.Enabled}}
         - image: ghcr.io/linuxsuren/library/postgres:16.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
-          name: mysql
+          name: postgres
           env:
           - name: POSTGRES_PASSWORD
             value: {{or .Spec.Services.Postgres.Password "root"}}
@@ -220,7 +220,7 @@ spec:
               name: cache
               subPath: postgres
         {{end}}
-        {{if .Spec.Services.TDEngine}}
+        {{if and .Spec.Services.TDEngine .Spec.Services.TDEngine.Enabled}}
         - image: ghcr.io/linuxsuren/tdengine/tdengine:3.3.2.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: taos
@@ -229,10 +229,10 @@ spec:
               name: cache
               subPath: taos
         {{end}}
-        {{if .Spec.Services.RabbitMQ}}
+        {{if and .Spec.Services.RabbitMQ .Spec.Services.RabbitMQ.Enabled}}
         - image: ghcr.io/linuxsuren/library/rabbitmq:3.13.6
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
-          name: mysql
+          name: rabbitmq
           env:
           - name: RABBITMQ_DEFAULT_USER
             value: {{or .Spec.Services.RabbitMQ.Username "guest"}}
