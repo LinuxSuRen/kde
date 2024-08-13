@@ -80,4 +80,5 @@ jobs:
       - name: Test
         run: |
           mkdir -p ui/kde-ui/dist
+          touch ui/kde-ui/dist/hello.txt
           make unit
