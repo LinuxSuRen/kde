@@ -87,5 +87,5 @@ func (r *DevSpacePodPodReconciler) Reconcile(ctx context.Context, req ctrl.Reque
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *DevSpacePodPodReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	return setupWithManagerAndLabels(mgr, &v1.Pod{}, map[string]string{LabelAppKind: "gitpod"}, r)
+	return setupWithManagerAndLabels(mgr, &v1.Pod{}, map[string]string{LabelAppKind: "devspace"}, r)
 }

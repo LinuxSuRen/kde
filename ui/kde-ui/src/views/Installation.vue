@@ -88,7 +88,16 @@ const uninstall = () => {
 
 const config = ref({} as Config)
 const loadConfig = () => {
-    fetch(`/api/config`, {}).then(res => res.json()).then(d => {
+    fetch(`/api/config`, {}).then(res => {
+        if (res.status !== 200) {
+            ElNotification({
+                title: 'Failed to load config',
+                type: 'error',
+            })
+        } else {
+            return res.json()
+        }
+    }).then(d => {
         config.value = d
     })
 }
@@ -132,8 +141,7 @@ const updateConfig = () => {
                     </el-form-item>
                     <el-form-item label="Image" prop="image">
                         <el-select v-model="installForm.image" style="width: 400px">
-                            <el-option v-for="item in imageList" :key="item"
-                                :label="item" :value="item" />
+                            <el-option v-for="item in imageList" :key="item" :label="item" :value="item" />
                         </el-select>
                     </el-form-item>
                 </el-form>

@@ -29,7 +29,7 @@ func (s *Server) GetConfig(c *gin.Context) {
 	ctx := c.Request.Context()
 	namespace := getNamespaceFromQuery(c)
 
-	cm := getConfigMap("config.json")
+	cm := getConfigMap("config.yaml")
 	cm.SetNamespace(namespace)
 
 	var err error
@@ -40,7 +40,7 @@ func (s *Server) GetConfig(c *gin.Context) {
 	}
 
 	config := &core.Config{}
-	if configStr, ok := cm.Data["config.json"]; ok {
+	if configStr, ok := cm.Data[core.ConfigFileName]; ok {
 		if config, err = core.ParseConfigAsJSON([]byte(configStr)); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -60,7 +60,7 @@ func (s *Server) UpdateConfig(c *gin.Context) {
 		return
 	}
 
-	cm := getConfigMap("config.json")
+	cm := getConfigMap("config.yaml")
 	cm.SetNamespace(namespace)
 
 	cm, err = s.Client.CoreV1().ConfigMaps(namespace).Get(ctx, cm.GetName(), metav1.GetOptions{})
@@ -71,7 +71,7 @@ func (s *Server) UpdateConfig(c *gin.Context) {
 
 	var data []byte
 	if data, err = config.ToJSON(); err == nil {
-		cm.Data["config.json"] = string(data)
+		cm.Data[core.ConfigFileName] = string(data)
 		_, err = s.Client.CoreV1().ConfigMaps(namespace).Update(ctx, cm, metav1.UpdateOptions{})
 	}
 

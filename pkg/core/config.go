@@ -49,3 +49,5 @@ func ParseConfigAsJSON(data []byte) (config *Config, err error) {
 func (c *Config) ToJSON() ([]byte, error) {
 	return json.Marshal(c)
 }
+
+const ConfigFileName = "config.json"

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    linuxsuren.github.io/application_kind: gitpod
+    linuxsuren.github.io/application_kind: devspace
     linuxsuren.github.io/application: {{.ObjectMeta.Name}}
   name: {{.ObjectMeta.Name}}
   namespace: {{.ObjectMeta.Namespace}}
@@ -21,7 +21,7 @@ spec:
   {{ end }}
   selector:
     matchLabels:
-      linuxsuren.github.io/application_kind: gitpod
+      linuxsuren.github.io/application_kind: devspace
       linuxsuren.github.io/application: {{.ObjectMeta.Name}}
   strategy:
     rollingUpdate:
@@ -31,7 +31,7 @@ spec:
   template:
     metadata:
       labels:
-        linuxsuren.github.io/application_kind: gitpod
+        linuxsuren.github.io/application_kind: devspace
         linuxsuren.github.io/application: {{.ObjectMeta.Name}}
     spec:
       affinity:
@@ -40,7 +40,7 @@ spec:
           - podAffinityTerm:
               labelSelector:
                 matchLabels:
-                  linuxsuren.github.io/application_kind: gitpod
+                  linuxsuren.github.io/application_kind: devspace
                   linuxsuren.github.io/application: {{.ObjectMeta.Name}}
               topologyKey: kubernetes.io/hostname
             weight: 5
