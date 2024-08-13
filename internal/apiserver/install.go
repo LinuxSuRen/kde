@@ -30,6 +30,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -77,6 +78,19 @@ func (s *Server) Install(c *gin.Context) {
 	sa.SetNamespace(namespace)
 	_, saErr := s.Client.CoreV1().ServiceAccounts(namespace).Create(ctx, sa, metav1.CreateOptions{})
 
+	clusterRole := getClusterRole("role.yaml")
+	_, clusterRoleErr := s.Client.RbacV1().ClusterRoles().Create(ctx, clusterRole, metav1.CreateOptions{})
+
+	clusterRoleBinding := getClusterRoleBinding("role_binding.yaml")
+	clusterRoleBinding.Subjects = []rbacv1.Subject{
+		{
+			Kind:      "ServiceAccount",
+			Name:      sa.GetName(),
+			Namespace: namespace,
+		},
+	}
+	_, clusterRoleBindingErr := s.Client.RbacV1().ClusterRoleBindings().Create(ctx, clusterRoleBinding, metav1.CreateOptions{})
+
 	cm := getConfigMap("config.yaml")
 	cm.SetNamespace(namespace)
 	_, cmErr := s.Client.CoreV1().ConfigMaps(namespace).Create(ctx, cm, metav1.CreateOptions{})
@@ -104,7 +118,8 @@ func (s *Server) Install(c *gin.Context) {
 	_, ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Create(ctx, ingress, metav1.CreateOptions{})
 
 	err = errors.Join(client.IgnoreAlreadyExists(crdDevSpaceErr), client.IgnoreAlreadyExists(crdUserErr),
-		client.IgnoreAlreadyExists(saErr), client.IgnoreAlreadyExists(cmErr),
+		client.IgnoreAlreadyExists(saErr), client.IgnoreNotFound(clusterRoleErr), client.IgnoreNotFound(clusterRoleBindingErr),
+		client.IgnoreAlreadyExists(cmErr),
 		client.IgnoreAlreadyExists(deployErr), client.IgnoreAlreadyExists(apiserverDeployErr),
 		client.IgnoreAlreadyExists(serviceErr), client.IgnoreAlreadyExists(ingressErr))
 	if err != nil {
@@ -128,6 +143,9 @@ func (s *Server) Uninstall(c *gin.Context) {
 	sa := getServiceAccount("service_account.yaml")
 	saErr := s.Client.CoreV1().ServiceAccounts(namespace).Delete(ctx, sa.GetName(), metav1.DeleteOptions{})
 
+	clusterRole := getClusterRole("role.yaml")
+	clusterRoleErr := s.Client.RbacV1().ClusterRoles().Delete(ctx, clusterRole.GetName(), metav1.DeleteOptions{})
+
 	cm := getConfigMap("config.yaml")
 	cmErr := s.Client.CoreV1().ConfigMaps(namespace).Delete(ctx, cm.GetName(), metav1.DeleteOptions{})
 
@@ -144,7 +162,8 @@ func (s *Server) Uninstall(c *gin.Context) {
 	ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Delete(ctx, ingress.GetName(), metav1.DeleteOptions{})
 
 	err := errors.Join(client.IgnoreNotFound(crdDevSpaceErr), client.IgnoreNotFound(crdUserErr),
-		client.IgnoreNotFound(saErr), client.IgnoreNotFound(cmErr), client.IgnoreNotFound(deployErr),
+		client.IgnoreNotFound(saErr), client.IgnoreNotFound(clusterRoleErr), client.IgnoreNotFound(cmErr),
+		client.IgnoreNotFound(deployErr),
 		client.IgnoreNotFound(apiserverDeployErr), client.IgnoreNotFound(serviceErr),
 		client.IgnoreNotFound(ingressErr))
 	if err != nil {
@@ -217,6 +236,26 @@ func getServiceAccount(name string) *corev1.ServiceAccount {
 	return sa
 }
 
+func getClusterRole(name string) *rbacv1.ClusterRole {
+	var err error
+	data, _ := config.GetFile(filepath.Join("rbac", name))
+	cr := &rbacv1.ClusterRole{}
+	if data, err = yaml.ToJSON(data); err == nil {
+		yaml.Unmarshal(data, cr)
+	}
+	return cr
+}
+
+func getClusterRoleBinding(name string) *rbacv1.ClusterRoleBinding {
+	var err error
+	data, _ := config.GetFile(filepath.Join("rbac", name))
+	crb := &rbacv1.ClusterRoleBinding{}
+	if data, err = yaml.ToJSON(data); err == nil {
+		yaml.Unmarshal(data, crb)
+	}
+	return crb
+}
+
 type InstanceStatus struct {
 	Component string `json:"component"`
 	Name      string `json:"name"`
@@ -268,6 +307,8 @@ func (s *Server) getInstanceStatus(ctx context.Context, namespace string) []Inst
 		s.getDeploymentStatus(ctx, namespace, "manager"),
 		s.getDeploymentStatus(ctx, namespace, "apiserver-deploy"),
 		s.getServiceStatus(ctx, namespace, "apiserver-service"),
+		s.getClusterRoleStatus(ctx, "manager-role"),
+		s.getClusterRoleBindingStatus(ctx, "manager-rolebinding"),
 		s.getConfigmapStatus(ctx, namespace, "config"),
 		s.getIngressStatus(ctx, namespace, "apiserver"),
 	}
@@ -317,6 +358,38 @@ func (s *Server) getServiceStatus(ctx context.Context, namespace, name string) I
 	} else {
 		return InstanceStatus{
 			Component: "Service",
+			Name:      name,
+			Status:    "not installed",
+		}
+	}
+}
+
+func (s *Server) getClusterRoleStatus(ctx context.Context, name string) InstanceStatus {
+	if _, err := s.Client.RbacV1().ClusterRoles().Get(ctx, name, metav1.GetOptions{}); err == nil {
+		return InstanceStatus{
+			Component: "ClusterRole",
+			Name:      name,
+			Status:    "installed",
+		}
+	} else {
+		return InstanceStatus{
+			Component: "ClusterRole",
+			Name:      name,
+			Status:    "not installed",
+		}
+	}
+}
+
+func (s *Server) getClusterRoleBindingStatus(ctx context.Context, name string) InstanceStatus {
+	if _, err := s.Client.RbacV1().ClusterRoleBindings().Get(ctx, name, metav1.GetOptions{}); err == nil {
+		return InstanceStatus{
+			Component: "ClusterRoleBinding",
+			Name:      name,
+			Status:    "installed",
+		}
+	} else {
+		return InstanceStatus{
+			Component: "ClusterRoleBinding",
 			Name:      name,
 			Status:    "not installed",
 		}

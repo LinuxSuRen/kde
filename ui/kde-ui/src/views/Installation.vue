@@ -88,7 +88,7 @@ const uninstall = () => {
 
 const config = ref({} as Config)
 const loadConfig = () => {
-    fetch(`/api/config`, {}).then(res => {
+    fetch(`/api/config?namespace=${installForm.namespace}`, {}).then(res => {
         if (res.status !== 200) {
             ElNotification({
                 title: 'Failed to load config',
@@ -102,7 +102,7 @@ const loadConfig = () => {
     })
 }
 const updateConfig = () => {
-    fetch(`/api/config`, {
+    fetch(`/api/config?namespace=${installForm.namespace}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json'
@@ -134,7 +134,8 @@ const updateConfig = () => {
 
                 <el-form :model="installForm" label-width="auto" inline>
                     <el-form-item label="Namespace" prop="namespace">
-                        <el-select v-model="installForm.namespace" clearable placeholder="Select" style="width: 240px">
+                        <el-select v-model="installForm.namespace" clearable placeholder="Select" filterable
+                            style="width: 240px">
                             <el-option v-for="item in namespaceList.items" :key="item.metadata.name"
                                 :label="item.metadata.name" :value="item.metadata.name" />
                         </el-select>

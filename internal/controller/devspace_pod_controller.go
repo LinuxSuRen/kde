@@ -35,6 +35,7 @@ type DevSpacePodPodReconciler struct {
 }
 
 //+kubebuilder:rbac:groups="",resources=pods,verbs=get;list
+// +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list
 
 func (r *DevSpacePodPodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (result ctrl.Result, err error) {
 	r.ctx = ctx
