@@ -54,7 +54,7 @@ spec:
         args:
           - --leader-elect
           - --health-probe-bind-address=:8081
-          - --config=/var/data/config.yaml
+          - --config=/var/data/config.json
         image: ghcr.io/linuxsuren/kde:latest
         name: manager
         securityContext:
