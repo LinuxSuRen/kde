@@ -162,7 +162,7 @@ spec:
               subPath: docker
             - mountPath: /var/run
               name: container-runtime
-        {{if .Spec.Services.Docker}}
+        {{if and .Spec.Services.Docker .Spec.Services.Docker.Enabled}}
         - image: ghcr.io/linuxsuren/library/docker:27.0.3-dind
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: docker
@@ -187,12 +187,12 @@ spec:
             - mountPath: /etc/docker
               name: config
         {{end}}
-        {{if .Spec.Services.Redis}}
+        {{if and .Spec.Services.Redis .Spec.Services.Redis.Enabled}}
         - image: ghcr.io/linuxsuren/library/redis:7.0.14
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: redis
         {{end}}
-        {{if .Spec.Services.MySQL}}
+        {{if and .Spec.Services.MySQL .Spec.Services.MySQL.Enabled}}
         - image: ghcr.io/linuxsuren/library/mysql:8.2.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: mysql
@@ -206,7 +206,7 @@ spec:
               name: cache
               subPath: mysql
         {{end}}
-        {{if .Spec.Services.Postgres}}
+        {{if and .Spec.Services.Postgres .Spec.Services.Postgres.Enabled}}
         - image: ghcr.io/linuxsuren/library/postgres:16.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: postgres
@@ -220,7 +220,7 @@ spec:
               name: cache
               subPath: postgres
         {{end}}
-        {{if .Spec.Services.TDEngine}}
+        {{if and .Spec.Services.TDEngine .Spec.Services.TDEngine.Enabled}}
         - image: ghcr.io/linuxsuren/tdengine/tdengine:3.3.2.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: taos
@@ -229,7 +229,7 @@ spec:
               name: cache
               subPath: taos
         {{end}}
-        {{if .Spec.Services.RabbitMQ}}
+        {{if and .Spec.Services.RabbitMQ .Spec.Services.RabbitMQ.Enabled}}
         - image: ghcr.io/linuxsuren/library/rabbitmq:3.13.6
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: rabbitmq
