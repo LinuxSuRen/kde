@@ -82,9 +82,7 @@ func TestGitPodTemplateRender(t *testing.T) {
 }
 
 func TestUpdateStatus(t *testing.T) {
-	reconciler := &DevSpaceReconciler{
-		Ingress: "gitpod.linuxsuren.github.io",
-	}
+	reconciler := &DevSpaceReconciler{}
 	gitpod := createDefaultGitPod()
 	gitpod = reconciler.updateStatus(gitpod)
 	assert.Equal(t, "demo.gitpod.linuxsuren.github.io", gitpod.Status.Link)
@@ -277,7 +275,6 @@ func TestGitPodController(t *testing.T) {
 			r := &DevSpaceReconciler{
 				Client:   tt.fields.Client,
 				Recorder: tt.fields.recorder,
-				Ingress:  "gitpod.linuxsuren.github.io",
 			}
 			mgr := &FakeManager{
 				Client: tt.fields.Client,

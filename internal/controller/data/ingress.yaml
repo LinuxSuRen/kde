@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   labels:
     linuxsuren.github.io/application: {{.ObjectMeta.Name}}
-    linuxsuren.github.io/application_kind: gitpod
+    linuxsuren.github.io/application_kind: devspace
   annotations:
     {{ if .Spec.Auth.BasicAuth }}
     nginx.ingress.kubernetes.io/auth-secret: {{.ObjectMeta.Name}}

@@ -22,7 +22,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
 	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
-	"github.com/linuxsuren/kde/pkg/core"
 	"github.com/spf13/cobra"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/dynamic"
@@ -40,7 +39,6 @@ func main() {
 	}
 	flags := cmd.Flags()
 	flags.StringVar(&opt.address, "address", ":8080", "The address to listen")
-	flags.StringVar(&opt.config, "config", "", "The config file")
 	flags.StringVar(&opt.kubeConfig, "kube-config", os.ExpandEnv("$HOME/.kube/config"), "The kube config file")
 	flags.StringVar(&opt.providerName, "oauth-provider-name", "", "The OAuth provider name")
 	flags.StringVar(&opt.clientID, "oauth-client-id", "", "The OAuth client ID")
@@ -52,7 +50,6 @@ func main() {
 
 type option struct {
 	address                              string
-	config                               string
 	kubeConfig                           string
 	providerName, clientID, clientSecret string
 }
@@ -93,14 +90,6 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 		KClient:   kClient,
 		DClient:   dyClient,
 		ExtClient: extClient,
-	}
-
-	if o.config != "" {
-		if server.Config, err = core.ReadConfigFromJSONFile(o.config); err != nil {
-			return
-		}
-	} else {
-		server.Config = &core.Config{}
 	}
 
 	r := gin.Default()

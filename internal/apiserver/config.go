@@ -32,21 +32,11 @@ func (s *Server) GetConfig(c *gin.Context) {
 	cm := getConfigMap("config.yaml")
 	cm.SetNamespace(namespace)
 
-	var err error
-	cm, err = s.Client.CoreV1().ConfigMaps(namespace).Get(ctx, cm.GetName(), metav1.GetOptions{})
-	if err != nil {
+	if config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(namespace), cm.GetName()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	} else {
+		c.JSON(http.StatusOK, config)
 	}
-
-	config := &core.Config{}
-	if configStr, ok := cm.Data[core.ConfigFileName]; ok {
-		if config, err = core.ParseConfigAsJSON([]byte(configStr)); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-	}
-	c.JSON(http.StatusOK, config)
 }
 
 func (s *Server) UpdateConfig(c *gin.Context) {

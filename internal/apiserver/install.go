@@ -146,6 +146,9 @@ func (s *Server) Uninstall(c *gin.Context) {
 	clusterRole := getClusterRole("role.yaml")
 	clusterRoleErr := s.Client.RbacV1().ClusterRoles().Delete(ctx, clusterRole.GetName(), metav1.DeleteOptions{})
 
+	clusterRoleBinding := getClusterRoleBinding("role_binding.yaml")
+	clusterRoleBindingErr := s.Client.RbacV1().ClusterRoleBindings().Delete(ctx, clusterRoleBinding.GetName(), metav1.DeleteOptions{})
+
 	cm := getConfigMap("config.yaml")
 	cmErr := s.Client.CoreV1().ConfigMaps(namespace).Delete(ctx, cm.GetName(), metav1.DeleteOptions{})
 
@@ -156,14 +159,15 @@ func (s *Server) Uninstall(c *gin.Context) {
 	apiserverDeployErr := s.Client.AppsV1().Deployments(namespace).Delete(ctx, apiserverDeploy.GetName(), metav1.DeleteOptions{})
 
 	service := getService("apiserver-service.yaml")
+	println(service.GetName() + "---")
 	serviceErr := s.Client.CoreV1().Services(namespace).Delete(ctx, service.GetName(), metav1.DeleteOptions{})
 
 	ingress := getIngress("ingress.yaml")
 	ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Delete(ctx, ingress.GetName(), metav1.DeleteOptions{})
 
 	err := errors.Join(client.IgnoreNotFound(crdDevSpaceErr), client.IgnoreNotFound(crdUserErr),
-		client.IgnoreNotFound(saErr), client.IgnoreNotFound(clusterRoleErr), client.IgnoreNotFound(cmErr),
-		client.IgnoreNotFound(deployErr),
+		client.IgnoreNotFound(saErr), client.IgnoreNotFound(clusterRoleErr), client.IgnoreNotFound(clusterRoleBindingErr),
+		client.IgnoreNotFound(cmErr), client.IgnoreNotFound(deployErr),
 		client.IgnoreNotFound(apiserverDeployErr), client.IgnoreNotFound(serviceErr),
 		client.IgnoreNotFound(ingressErr))
 	if err != nil {
@@ -306,7 +310,7 @@ func (s *Server) getInstanceStatus(ctx context.Context, namespace string) []Inst
 		s.getCRDStatus(ctx, "users.linuxsuren.github.io"),
 		s.getDeploymentStatus(ctx, namespace, "manager"),
 		s.getDeploymentStatus(ctx, namespace, "apiserver-deploy"),
-		s.getServiceStatus(ctx, namespace, "apiserver-service"),
+		s.getServiceStatus(ctx, namespace, "apiserver"),
 		s.getClusterRoleStatus(ctx, "manager-role"),
 		s.getClusterRoleBindingStatus(ctx, "manager-rolebinding"),
 		s.getConfigmapStatus(ctx, namespace, "config"),
@@ -441,6 +445,7 @@ func (s *Server) Namespaces(c *gin.Context) {
 
 func (s *Server) Images(c *gin.Context) {
 	c.JSON(http.StatusOK, []string{
+		"registry.aliyuncs.com/linuxsuren/kde:master",
 		"ghcr.io/linuxsuren/kde:latest",
 		"registry.aliyuncs.com/linuxsuren/kde:latest",
 		"docker.io/linuxsuren/kde:latest",

@@ -24,8 +24,6 @@ spec:
       containers:
       - command:
         - /server
-        args:
-        - --config=/var/data/config.json
         image: ghcr.io/linuxsuren/kde:latest
         name: server
         securityContext:
@@ -52,12 +50,5 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
-        volumeMounts:
-        - mountPath: /var/data
-          name: config
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10
-      volumes:
-      - name: config
-        configMap:
-          name: config
