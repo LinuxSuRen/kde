@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -34,6 +35,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/johnaoss/htpasswd/apr1"
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
+	"github.com/linuxsuren/kde/pkg/core"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -42,15 +44,16 @@ type DevSpaceReconciler struct {
 	client.Client
 	Scheme   *runtime.Scheme
 	Recorder record.EventRecorder
-	Ingress  string
 	// inner fields
 	ctx context.Context
 	log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=linuxsuren.github.io.,resources=devspaces,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=linuxsuren.github.io.,resources=devspaces/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=linuxsuren.github.io.,resources=devspaces/finalizers,verbs=update
+// +kubebuilder:rbac:groups=linuxsuren.github.io,resources=devspaces,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=linuxsuren.github.io,resources=devspaces/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=linuxsuren.github.io,resources=devspaces/finalizers,verbs=update
+// +kubebuilder:rbac:groups="",resources=persistentvolumeclaims,verbs=get;list;delete;create;update;watch
+// +kubebuilder:rbac:groups="",resources=secrets,verbs=get;list;delete;create;update;watch
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -72,12 +75,20 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 		return
 	}
 
-	// if mode, ok := devSpace.Annotations[v1alpha1.AnnoKeyMaintainMode]; !ok || mode != PolicyAlways {
-	// 	r.log.Info("skip reconcile gitpod", "maintain mode", mode)
-	// 	return
-	// }
+	config := &core.Config{}
+	configCM := &corev1.ConfigMap{}
+	if cfgErr := r.Get(ctx, types.NamespacedName{
+		Name:      "config",
+		Namespace: req.Namespace,
+	}, configCM); cfgErr == nil {
+        if config, cfgErr = core.ReadConfigFromConfigMap(configCM); err != nil {
+            r.log.Error(cfgErr, "failed to parse config")
+        }
+	} else {
+        r.log.Error(cfgErr, "failed to get config")
+    }
 
-	setDefaultValueForGitPod(devSpace, r.Ingress)
+	setDefaultValueForGitPod(devSpace, config.Host)
 	devSpace = r.updateStatus(devSpace)
 
 	_ = r.Status().Update(ctx, devSpace.DeepCopy())
@@ -86,7 +97,7 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 		err = client.IgnoreNotFound(err)
 		return
 	}
-	setDefaultValueForGitPod(devSpace, r.Ingress)
+	setDefaultValueForGitPod(devSpace, config.Host)
 	configmap := turnTemplateToUnstructured(gitpodConfigMap, devSpace)
 	secret := turnTemplateToUnstructured(gitpodSecret, devSpace)
 	pvc := turnTemplateToUnstructured(gitpodPvc, devSpace)

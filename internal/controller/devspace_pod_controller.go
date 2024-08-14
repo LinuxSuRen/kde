@@ -34,17 +34,20 @@ type DevSpacePodPodReconciler struct {
 	log logr.Logger
 }
 
-//+kubebuilder:rbac:groups="",resources=pods,verbs=get;list
+//+kubebuilder:rbac:groups="",resources=pods,verbs=get;list;watch
 // below rbac should in the apiserver
 // +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list
-// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;delete;create;update
+// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;delete;create;update;watch
 // +kubebuilder:rbac:groups="",resources=services,verbs=get;list;delete;create;update
 // +kubebuilder:rbac:groups="",resources=serviceaccounts,verbs=get;list;delete;create;update
 // +kubebuilder:rbac:groups="apps",resources=deployments,verbs=get;list;delete;create;update
 // +kubebuilder:rbac:groups="apiextensions.k8s.io",resources=namespaces,verbs=get;list;delete;create;update
-// +kubebuilder:rbac:groups="networking.k8s.io",resources=ingresses,verbs=get;list;delete;create;update
+// +kubebuilder:rbac:groups="networking.k8s.io",resources=ingresses,verbs=get;list;delete;create;update;watch
 // +kubebuilder:rbac:groups="rbac.authorization.k8s.io",resources=clusterroles,verbs=get;list;delete;create;update
 // +kubebuilder:rbac:groups="rbac.authorization.k8s.io",resources=clusterrolebindings,verbs=get;list;delete;create;update
+// below rbac required when retrieving the resource lock for leader election
+// +kubebuilder:rbac:groups="coordination.k8s.io",resources=leases,verbs=get;create;update
+// +kubebuilder:rbac:groups="",resources=events,verbs=create
 
 func (r *DevSpacePodPodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (result ctrl.Result, err error) {
 	r.ctx = ctx

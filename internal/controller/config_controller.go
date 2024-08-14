@@ -43,7 +43,8 @@ func NewConfigReconciler(mgr ctrl.Manager) *configReconciler {
 	}
 }
 
-// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list
+// +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;watch
+// +kubebuilder:rbac:groups="networking.k8s.io",resources=ingresses,verbs=get;list;update
 func (r *configReconciler) Reconcile(ctx context.Context, req ctrl.Request) (result ctrl.Result, err error) {
 	cm := &v1.ConfigMap{}
 	if err = r.Get(ctx, req.NamespacedName, cm); err != nil {
@@ -51,6 +52,7 @@ func (r *configReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 		return
 	}
 
+	r.log.Info("reconcile config", "key", req.NamespacedName)
 	configStr, ok := cm.Data[core.ConfigFileName]
 	if !ok {
 		return
@@ -58,6 +60,7 @@ func (r *configReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 
 	var configObj *core.Config
 	if configObj, err = core.ParseConfigAsJSON([]byte(configStr)); err != nil {
+		r.log.Error(err, "failed to parse config")
 		return
 	}
 
@@ -73,7 +76,10 @@ func (r *configReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 		return
 	}
 
-	if err = r.Get(ctx, client.ObjectKeyFromObject(ingress), ingress); err != nil {
+    ingress.SetNamespace(cm.Namespace)
+	ingressKey := client.ObjectKeyFromObject(ingress)
+	r.log.Info("start to update ingress", "key", ingressKey)
+	if err = r.Get(ctx, ingressKey, ingress); err != nil {
 		err = client.IgnoreNotFound(err)
 		return
 	}

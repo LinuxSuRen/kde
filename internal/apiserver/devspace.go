@@ -37,11 +37,10 @@ type Server struct {
 	KClient   *kdeClient.Clientset
 	DClient   dynamic.Interface
 	ExtClient *apiextensionsclientset.Clientset
-
-	Config *core.Config
 }
 
 func (s *Server) CreateDevSpace(c *gin.Context) {
+	ctx := c.Request.Context()
 	namespace := getNamespaceFromQuery(c)
 	// clone git repo
 
@@ -52,9 +51,13 @@ func (s *Server) CreateDevSpace(c *gin.Context) {
 	if err := c.BindJSON(devSpace); err != nil {
 		c.Error(err)
 	} else {
-		setDefaultConfig(devSpace, s.Config)
+		config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(namespace), "config")
+		if err != nil {
+			c.Error(err)
+		}
+		setDefaultConfig(devSpace, config)
 
-		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Create(c.Request.Context(), devSpace, metav1.CreateOptions{})
+		result, err := s.KClient.LinuxsurenV1alpha1().DevSpaces(namespace).Create(ctx, devSpace, metav1.CreateOptions{})
 		if err != nil {
 			c.Error(err)
 			c.JSON(http.StatusBadRequest, err)

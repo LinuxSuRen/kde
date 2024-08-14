@@ -14,6 +14,13 @@ rules:
   - get
   - list
   - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
 - apiGroups:
   - ""
   resources:
@@ -24,10 +31,33 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - persistentvolumeclaims
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
   - pods
   verbs:
   - get
   - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - update
+  - watch
 - apiGroups:
   - ""
   resources:
@@ -69,7 +99,15 @@ rules:
   - list
   - update
 - apiGroups:
-  - linuxsuren.github.io.
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - get
+  - update
+- apiGroups:
+  - linuxsuren.github.io
   resources:
   - devspaces
   verbs:
@@ -81,13 +119,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - linuxsuren.github.io.
+  - linuxsuren.github.io
   resources:
   - devspaces/finalizers
   verbs:
   - update
 - apiGroups:
-  - linuxsuren.github.io.
+  - linuxsuren.github.io
   resources:
   - devspaces/status
   verbs:
@@ -95,7 +133,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - linuxsuren.github.io.github.com
+  - linuxsuren.github.io
   resources:
   - users
   verbs:
@@ -107,13 +145,13 @@ rules:
   - update
   - watch
 - apiGroups:
-  - linuxsuren.github.io.github.com
+  - linuxsuren.github.io
   resources:
   - users/finalizers
   verbs:
   - update
 - apiGroups:
-  - linuxsuren.github.io.github.com
+  - linuxsuren.github.io
   resources:
   - users/status
   verbs:
@@ -130,6 +168,7 @@ rules:
   - get
   - list
   - update
+  - watch
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:

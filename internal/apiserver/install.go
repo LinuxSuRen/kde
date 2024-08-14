@@ -445,6 +445,7 @@ func (s *Server) Namespaces(c *gin.Context) {
 
 func (s *Server) Images(c *gin.Context) {
 	c.JSON(http.StatusOK, []string{
+		"registry.aliyuncs.com/linuxsuren/kde:master",
 		"ghcr.io/linuxsuren/kde:latest",
 		"registry.aliyuncs.com/linuxsuren/kde:latest",
 		"docker.io/linuxsuren/kde:latest",
