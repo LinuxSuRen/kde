@@ -105,6 +105,11 @@ export function NewEmptyDevSpace() {
     } as DevSpace;
 }
 
+export interface Language {
+    name: string;
+    image: string;
+}
+
 export interface Config {
     storageClassName: string;
     volumeMode: string;
@@ -112,4 +117,5 @@ export interface Config {
     ingressMode: string;
     imagePullPolicy: string;
     host: string;
+    languages: Language[],
 }
