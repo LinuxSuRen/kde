@@ -86,6 +86,19 @@ func TestReadConfigFromJSONFile(t *testing.T) {
 	}
 }
 
+func TestCleanInvalidLanguages(t *testing.T) {
+	languages := core.CleanInvalidLanguages([]core.Language{{
+		Name: "go",
+	}, {
+        Name: "go",
+        Image: "golang:latest",
+    }, {
+		Image: "golang:latest",
+	}})
+
+	assert.Len(t, languages, 1)
+}
+
 var sampleConfig = core.Config{
 	IngressMode:      "nginx",
 	StorageClassName: "local-path",

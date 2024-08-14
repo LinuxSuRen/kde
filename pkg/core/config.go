@@ -19,16 +19,22 @@ package core
 import (
 	"encoding/json"
 	"os"
+	"strings"
 )
 
 type Config struct {
-	StorageClassName string            `json:"storageClassName"`
-	VolumeMode       string            `json:"volumeMode"`
-	VolumeAccessMode string            `json:"volumeAccessMode"`
-	IngressMode      string            `json:"ingressMode"`
-	ImagePullPolicy  string            `json:"imagePullPolicy"`
-	Host             string            `json:"host"`
-	Languages        map[string]string `json:"languages"`
+	StorageClassName string     `json:"storageClassName"`
+	VolumeMode       string     `json:"volumeMode"`
+	VolumeAccessMode string     `json:"volumeAccessMode"`
+	IngressMode      string     `json:"ingressMode"`
+	ImagePullPolicy  string     `json:"imagePullPolicy"`
+	Host             string     `json:"host"`
+	Languages        []Language `json:"languages"`
+}
+
+type Language struct {
+	Name  string `json:"name"`
+	Image string `json:"image"`
 }
 
 func ReadConfigFromJSONFile(file string) (config *Config, err error) {
@@ -51,3 +57,20 @@ func (c *Config) ToJSON() ([]byte, error) {
 }
 
 const ConfigFileName = "config.json"
+
+func CleanInvalidLanguages(languages []Language) []Language {
+	for i := 0; i < len(languages); {
+		languages[i].Image = strings.TrimSpace(languages[i].Image)
+		languages[i].Name = strings.TrimSpace(languages[i].Name)
+		if languages[i].Image == "" || languages[i].Name == "" {
+			if i == len(languages)-1 {
+				languages = languages[:i]
+			} else {
+				languages = append(languages[:i], languages[i+1:]...)
+			}
+		} else {
+            i++
+        }
+	}
+	return languages
+}

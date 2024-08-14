@@ -137,7 +137,7 @@ const cancelDialog = () => {
                 <el-input v-model="ruleForm.name" />
             </el-form-item>
             <el-form-item label="Language" prop="image">
-                <el-select v-model="ruleForm.image" clearable placeholder="Select" style="width: 240px">
+                <el-select v-model="ruleForm.image" clearable filterable placeholder="Select" style="width: 240px">
                     <el-option v-for="item in devLanguages" :key="item.name" :label="item.name" :value="item.image" />
                 </el-select>
             </el-form-item>

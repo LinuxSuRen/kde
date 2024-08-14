@@ -86,7 +86,12 @@ const uninstall = () => {
     }).finally(loadInstanceStatusData)
 }
 
-const config = ref({} as Config)
+const config = ref({
+    languages: [{
+        name: '',
+        image: '',
+    }]
+} as Config)
 const loadConfig = () => {
     fetch(`/api/config?namespace=${installForm.namespace}`, {}).then(res => {
         if (res.status !== 200) {
@@ -98,6 +103,12 @@ const loadConfig = () => {
             return res.json()
         }
     }).then(d => {
+        if (!d.languages) {
+            d.languages = [{
+                name: '',
+                image: '',
+            }]
+        }
         config.value = d
     })
 }
@@ -190,6 +201,15 @@ const updateConfig = () => {
                     </el-form-item>
                     <el-form-item label="StorageClassName">
                         <el-input v-model="config.storageClassName" />
+                    </el-form-item>
+                    <el-form-item label="Custom Languages">
+                        <div v-for="(lan, index) in config.languages" :key="lan.name">
+                            Name:<el-input v-model="lan.name" style="width: 200px;" />
+                            Image:<el-input v-model="lan.image" style="width: 400px;" />
+                            <el-icon v-if="index == config.languages.length - 1">
+                                <Plus @click="config.languages.push({ name: '', image: '' })" />
+                            </el-icon>
+                        </div>
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary" @click="updateConfig">Submit</el-button>

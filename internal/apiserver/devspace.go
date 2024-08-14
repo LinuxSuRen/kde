@@ -21,6 +21,7 @@ import (
 	"embed"
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
@@ -167,6 +168,25 @@ func (s *Server) GetDevSpaceLanguages(c *gin.Context) {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, err)
 	} else {
+		cm := getConfigMap("config.yaml")
+		cm.SetNamespace("default")
+		ctx := c.Request.Context()
+
+		if config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(cm.GetNamespace()), cm.GetName()); err == nil {
+			for _, lan := range config.Languages {
+				lan.Name = strings.TrimSpace(lan.Name)
+				lan.Image = strings.TrimSpace(lan.Image)
+				if lan.Name == "" || lan.Image == "" {
+					continue
+				}
+
+				sliceData = append(sliceData, map[string]interface{}{
+					"name":  lan.Name,
+					"image": lan.Image,
+				})
+			}
+		}
+
 		c.JSON(http.StatusOK, sliceData)
 	}
 }

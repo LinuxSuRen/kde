@@ -50,6 +50,9 @@ func (s *Server) UpdateConfig(c *gin.Context) {
 		return
 	}
 
+    // clean invalid languages
+    config.Languages = core.CleanInvalidLanguages(config.Languages)
+
 	cm := getConfigMap("config.yaml")
 	cm.SetNamespace(namespace)
 
