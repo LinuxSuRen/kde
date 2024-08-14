@@ -14,6 +14,9 @@
     "name": "rust",
     "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-rust:v0.0.10"
 }, {
+    "name": "rustwasm",
+    "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-rustwasm:master"
+}, {
     "name": "full",
     "image": "registry.aliyuncs.com/linuxsuren/openvscode-server-images-full:v0.0.10"
 }]
