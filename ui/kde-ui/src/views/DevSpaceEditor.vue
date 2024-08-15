@@ -79,7 +79,14 @@
             <tr>
                 <td>Environment Variables</td>
                 <td>
-                    <el-input type="text" v-model="devspace.spec.envText"/>
+                    <el-input type="textarea" v-model="devspace.spec.envText"/>
+                </td>
+            </tr>
+            <tr>
+                <td>Git Setting</td>
+                <td>
+                    Username:<el-input v-model="devspace.spec.repository.username" style="width: 240px;"/>
+                    Email:<el-input v-model="devspace.spec.repository.email" style="width: 240px;"/>
                 </td>
             </tr>
         </table>
@@ -129,11 +136,20 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
                 enabled: false
             }
         }
+        if (!d.spec.repository) {
+            d.spec.repository = {
+                username: "",
+                email: ""
+            }
+        }
         devspace.value = d
         devspace.value.spec.status = d.spec.replicas > 0 ? true : false
-        d.spec.env.forEach((val: string, key: string) => {
-            devspace.value.spec.envText += key + '=' + val + "\n"
-        })
+        if (d.spec.env) {
+            devspace.value.spec.envText = ''
+            Object.keys(d.spec.env).map(key => {
+                devspace.value.spec.envText += key + "=" + d.spec.env[key] + "\n"
+            })
+        }
     }).catch((e) => {
         ElMessage({
             message: e,
@@ -144,7 +160,8 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
 
 const submitForm = () => {
     devspace.value.spec.replicas = devspace.value.spec.status ? 1 : 0
-    devspace.value.spec.envText.split("\n").array.forEach(env => {
+    devspace.value.spec.env = {}
+    Array.from(devspace.value.spec.envText.split("\n")).forEach(env => {
         const pair = env.split("=")
         if (pair.length == 2) {
             devspace.value.spec.env[pair[0]] = pair[1]
