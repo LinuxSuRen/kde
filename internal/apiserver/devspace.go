@@ -21,6 +21,7 @@ import (
 	"embed"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -125,6 +126,28 @@ func (s *Server) RestartDevSpace(c *gin.Context) {
 	}
 
 	err = s.updateReplicas(c.Request.Context(), namespace, name, 1)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+	c.JSON(http.StatusOK, "")
+}
+
+func (s *Server) SetDevSpaceReplicas(c *gin.Context) {
+	name := c.Params.ByName("devspace")
+	namespace := getNamespaceFromQuery(c)
+	replicas := c.Query("replicas")
+
+	var replicaNum int
+	var err error
+	if replicaNum, err = strconv.Atoi(replicas); err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, err)
+		return
+	}
+
+	err = s.updateReplicas(c.Request.Context(), namespace, name, int32(replicaNum))
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, err)

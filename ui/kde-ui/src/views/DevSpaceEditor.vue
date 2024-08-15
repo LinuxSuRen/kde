@@ -69,6 +69,13 @@
                     MySQL Database: <el-input v-model="devspace.spec.services.mysql.database" style="width: 240px" />
                 </td>
             </tr>
+            <tr>
+                <td>Status</td>
+                <td>
+                    <el-switch v-model="devspace.spec.status" class="mb-2" active-text="On" inline-prompt
+                        inactive-text="Off" />
+                </td>
+            </tr>
         </table>
         <el-button type="primary" @click="submitForm">Submit</el-button>
     </el-form>
@@ -117,6 +124,7 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
             }
         }
         devspace.value = d
+        devspace.value.spec.status = d.spec.replicas > 0 ? true : false
     }).catch((e) => {
         ElMessage({
             message: e,
@@ -126,6 +134,7 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
     })
 
 const submitForm = () => {
+    devspace.value.spec.replicas = devspace.value.spec.status ? 1 : 0
     fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, {
         method: 'PUT',
         body: JSON.stringify(devspace.value)

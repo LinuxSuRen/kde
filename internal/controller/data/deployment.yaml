@@ -70,7 +70,7 @@ spec:
               [[ -d "/var/data/.cache" ]] && [[ ! -d "/home/workspace/.cache" ]] && cp /var/data/.cache /home/workspace -a -r -n
               [[ -d "/var/data/.local" ]] && [[ ! -d "/home/workspace/.local" ]] && cp /var/data/.local /home/workspace -a -r -n
               [[ -d "/var/data/.oh-my-zsh" ]] && [[ ! -d "/home/workspace/.oh-my-zsh" ]] && cp /var/data/.oh-my-zsh /home/workspace -a -r -n
-              [[ -d "/var/data/.openvscode-server" ]] && [[ ! -d "/home/workspace/.openvscode-server" ]] && cp /var/data/.openvscode-server /home/workspace -a -r -n
+              [[ -d "/var/data/.openvscode-server" ]] && [[ ! -e "/home/workspace/.openvscode-server/lock" ]] && cp /var/data/.openvscode-server /home/workspace -a -r -n && touch /home/workspace/.openvscode-server/lock
               [[ -d "/var/data/.sdkman" ]] && [[ ! -d "/home/workspace/.sdkman" ]] && cp /var/data/.sdkman /home/workspace/ -a -r -n
               [[ -d "/var/data/.moon" ]] && [[ ! -d "/home/workspace/.moon" ]] && cp /var/data/.moon /home/workspace/ -a -r -n
               [[ -d "/var/data/.cargo" ]] && [[ ! -d "/home/workspace/.cargo" ]] && cp /var/data/.cargo /home/workspace/ -a -r -n
