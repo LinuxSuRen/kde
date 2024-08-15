@@ -98,6 +98,7 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 		return
 	}
 	apiserver.RegisterHealthEndpoint(r)
+	apiserver.POST("/webhook", apiserver.IDEWebhook)
 
 	authorizedAPI := r.Group("/api", apiserver.OAuthHandler(o.providerName))
 	authorizedAPI.GET("/devspace", server.ListDevSpace)
