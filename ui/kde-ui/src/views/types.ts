@@ -22,7 +22,7 @@ export interface DevSpace {
     spec: {
         cpu: string;
         memory: string;
-        env: Map<string, string>;
+        env: {};
         host: string;
         image: string;
         storage: string;
