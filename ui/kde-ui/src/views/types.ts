@@ -28,6 +28,7 @@ export interface DevSpace {
         storage: string;
         replicas: number;
         status: boolean; // a fake field which represents the replicas, 0 is off, 1 is on
+        envText: string; // a fake field which represents the env
         services: {
             docker: {
                 enabled: boolean;

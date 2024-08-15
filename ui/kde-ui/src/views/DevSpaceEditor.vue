@@ -76,6 +76,12 @@
                         inactive-text="Off" />
                 </td>
             </tr>
+            <tr>
+                <td>Environment Variables</td>
+                <td>
+                    <el-input type="text" v-model="devspace.spec.envText"/>
+                </td>
+            </tr>
         </table>
         <el-button type="primary" @click="submitForm">Submit</el-button>
     </el-form>
@@ -125,6 +131,9 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
         }
         devspace.value = d
         devspace.value.spec.status = d.spec.replicas > 0 ? true : false
+        d.spec.env.forEach((val: string, key: string) => {
+            devspace.value.spec.envText += key + '=' + val + "\n"
+        })
     }).catch((e) => {
         ElMessage({
             message: e,
@@ -135,6 +144,12 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
 
 const submitForm = () => {
     devspace.value.spec.replicas = devspace.value.spec.status ? 1 : 0
+    devspace.value.spec.envText.split("\n").array.forEach(env => {
+        const pair = env.split("=")
+        if (pair.length == 2) {
+            devspace.value.spec.env[pair[0]] = pair[1]
+        }
+    });
     fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, {
         method: 'PUT',
         body: JSON.stringify(devspace.value)
