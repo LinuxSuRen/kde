@@ -120,6 +120,7 @@ type GitRepository struct {
 	Username string `json:"username"`
 	// Password is the password
 	Password string `json:"password,omitempty"`
+	Email    string `json:"email,omitempty"`
 }
 
 // DevSpaceStatus defines the observed state of DevSpace
