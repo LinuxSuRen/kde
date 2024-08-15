@@ -26,6 +26,8 @@ export interface DevSpace {
         host: string;
         image: string;
         storage: string;
+        replicas: number;
+        status: boolean; // a fake field which represents the replicas, 0 is off, 1 is on
         services: {
             docker: {
                 enabled: boolean;
@@ -79,6 +81,7 @@ export function NewEmptyDevSpace() {
             host: "",
             image: "",
             storage: "",
+            status: false,
             services: {
                 docker: {
                     enabled: false,
@@ -117,5 +120,5 @@ export interface Config {
     ingressMode: string;
     imagePullPolicy: string;
     host: string;
-    languages: Language[],
+    languages: Language[];
 }
