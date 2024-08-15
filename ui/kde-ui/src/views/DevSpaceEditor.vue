@@ -160,13 +160,15 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
 
 const submitForm = () => {
     devspace.value.spec.replicas = devspace.value.spec.status ? 1 : 0
-    devspace.value.spec.env = {}
-    Array.from(devspace.value.spec.envText.split("\n")).forEach(env => {
-        const pair = env.split("=")
-        if (pair.length == 2) {
-            devspace.value.spec.env[pair[0]] = pair[1]
-        }
-    });
+    devspace.value.spec.env = new Map<string, string>()
+    if (devspace.value.spec.envText) {
+        Array.from(devspace.value.spec.envText.split("\n")).forEach(env => {
+            const pair = env.split("=")
+            if (pair.length == 2) {
+                devspace.value.spec.env.set(pair[0], pair[1])
+            }
+        });
+    }
     fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, {
         method: 'PUT',
         body: JSON.stringify(devspace.value)

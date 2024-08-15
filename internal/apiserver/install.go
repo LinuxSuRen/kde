@@ -66,7 +66,7 @@ func (s *Server) Install(c *gin.Context) {
 
 	namespace := installReq.Namespace
 	if namespace == "" {
-		namespace = "default"
+		namespace = s.SystemNamespace
 	}
 	crdDevSpace := getCRD("linuxsuren.github.io_devspaces.yaml")
 	_, crdDevSpaceErr := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, crdDevSpace, metav1.CreateOptions{})
@@ -159,7 +159,6 @@ func (s *Server) Uninstall(c *gin.Context) {
 	apiserverDeployErr := s.Client.AppsV1().Deployments(namespace).Delete(ctx, apiserverDeploy.GetName(), metav1.DeleteOptions{})
 
 	service := getService("apiserver-service.yaml")
-	println(service.GetName() + "---")
 	serviceErr := s.Client.CoreV1().Services(namespace).Delete(ctx, service.GetName(), metav1.DeleteOptions{})
 
 	ingress := getIngress("ingress.yaml")
@@ -276,11 +275,7 @@ func (s *Server) ServerImages(c *gin.Context) {
 
 func (s *Server) InstanceStatus(c *gin.Context) {
 	ctx := c.Request.Context()
-	namespace := c.DefaultQuery("namespace", "default")
-	if namespace == "" {
-		namespace = "default"
-	}
-	c.JSON(http.StatusOK, s.getInstanceStatus(ctx, namespace))
+	c.JSON(http.StatusOK, s.getInstanceStatus(ctx, s.SystemNamespace))
 }
 
 func (s *Server) InstanceStatusWS(c *gin.Context) {

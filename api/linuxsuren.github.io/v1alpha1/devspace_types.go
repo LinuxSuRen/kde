@@ -181,6 +181,8 @@ const (
 	AnnoKeyIngressMode      = "linuxsuren.github.io/ingress-mode"
 	AnnoKeyBasicAuth        = "linuxsuren.github.io/basic-auth"
 	AnnoKeyMaintainMode     = "linuxsuren.github.io/maintain-mode"
+	AnnoKeyServiceName      = "linuxsuren.github.io/service-name"
+	AnnoKeyServiceNamespace = "linuxsuren.github.io/service-namespace"
 )
 
 func init() {

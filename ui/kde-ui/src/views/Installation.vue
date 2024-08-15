@@ -18,11 +18,16 @@ const installForm = reactive({
 })
 
 const instanceStatusData = ref()
+const installStatusLoading = ref(true)
+
 const loadInstanceStatusData = () => {
+    installStatusLoading.value = true
     fetch(`/api/instanceStatus?namespace=${installForm.namespace}`, {
         method: 'GET'
     }).then(res => res.json()).then(d => {
         instanceStatusData.value = d
+    }).finally(() => {
+        installStatusLoading.value = false
     })
 }
 loadInstanceStatusData()
@@ -86,6 +91,7 @@ const uninstall = () => {
     }).finally(loadInstanceStatusData)
 }
 
+const configLoading = ref(true)
 const config = ref({
     languages: [{
         name: '',
@@ -93,6 +99,7 @@ const config = ref({
     }]
 } as Config)
 const loadConfig = () => {
+    configLoading.value = true
     fetch(`/api/config?namespace=${installForm.namespace}`, {}).then(res => {
         if (res.status !== 200) {
             ElNotification({
@@ -110,6 +117,8 @@ const loadConfig = () => {
             }]
         }
         config.value = d
+    }).finally(() => {
+        configLoading.value = false
     })
 }
 const updateConfig = () => {
@@ -138,7 +147,7 @@ const updateConfig = () => {
 <template>
     <div>
         <el-tabs type="border-card" v-model="tabActive">
-            <el-tab-pane name="Install">
+            <el-tab-pane name="Install" v-loading="installStatusLoading">
                 <template #label>
                     <span>Install</span>
                 </template>
@@ -173,7 +182,7 @@ const updateConfig = () => {
                     <el-button type="primary" @click="tabActive = 'Configuration'">Next</el-button>
                 </div>
             </el-tab-pane>
-            <el-tab-pane name="Configuration">
+            <el-tab-pane name="Configuration" v-loading="configLoading">
                 <template #label>
                     <span class="custom-tabs-label">
                         <span>Configuration</span>

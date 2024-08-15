@@ -1,7 +1,7 @@
 <template>
     <el-button type="primary" @click="devSpaceCreationVisible = true">New</el-button>
     <el-button type="primary" @click="loadData">Reload</el-button>
-    <el-table :data="tableData" style="width: 100%" :row-class-name="tableRowClassName">
+    <el-table :data="tableData" style="width: 100%" :row-class-name="tableRowClassName" v-loading="dashboardLoading">
         <el-table-column prop="metadata.name" label="Name" width="100">
             <template #default="scope">
                 <el-button link type="primary" size="small"
@@ -57,14 +57,18 @@ const tableRowClassName = ({
     return ''
 }
 
+const dashboardLoading = ref(true)
 const tableData = ref([] as DevSpace[])
 const loadData = () => {
+    dashboardLoading.value = true
     fetch('/api/devspace', {
         method: 'GET'
     }).then(res => {
         return res.json()
     }).then(d => {
         tableData.value = d.items
+    }).finally(() => {
+        dashboardLoading.value = false
     })
 }
 loadData()

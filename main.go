@@ -43,6 +43,7 @@ func main() {
 	flags.StringVar(&opt.providerName, "oauth-provider-name", "", "The OAuth provider name")
 	flags.StringVar(&opt.clientID, "oauth-client-id", "", "The OAuth client ID")
 	flags.StringVar(&opt.clientSecret, "oauth-client-secret", "", "The OAuth client secret")
+	flags.StringVar(&opt.systemNamespace, "system-namespace", "kde-system", "The system namespace")
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -52,6 +53,7 @@ type option struct {
 	address                              string
 	kubeConfig                           string
 	providerName, clientID, clientSecret string
+	systemNamespace                      string
 }
 
 func (o *option) runE(cmd *cobra.Command, args []string) {
@@ -86,10 +88,11 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 	}
 
 	server := &apiserver.Server{
-		Client:    clientset,
-		KClient:   kClient,
-		DClient:   dyClient,
-		ExtClient: extClient,
+		Client:          clientset,
+		KClient:         kClient,
+		DClient:         dyClient,
+		ExtClient:       extClient,
+		SystemNamespace: o.systemNamespace,
 	}
 
 	r := gin.Default()
