@@ -20,7 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func IDEWebhook(c *gin.Content) {
+func IDEWebhook(c *gin.Context) {
 
 }
 
