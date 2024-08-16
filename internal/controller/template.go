@@ -18,16 +18,17 @@ package controller
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
-func turnTemplateToUnstructured(tplText string, app interface{}) (result *unstructured.Unstructured) {
-	if tpl, err := template.New("turnTemplateToUnstructured").Parse(tplText); err == nil {
+func turnTemplateToUnstructured(tplText string, app interface{}) (result *unstructured.Unstructured, err error) {
+	var tpl *template.Template
+	if tpl, err = template.New("turnTemplateToUnstructured").Funcs(sprig.FuncMap()).Parse(tplText); err == nil {
 		buf := new(bytes.Buffer)
 		if err = tpl.Execute(buf, app); err == nil {
 			if strings.TrimSpace(buf.String()) == "" {
@@ -39,11 +40,7 @@ func turnTemplateToUnstructured(tplText string, app interface{}) (result *unstru
 			if data, err = yaml.ToJSON(buf.Bytes()); err == nil {
 				_ = result.UnmarshalJSON(data)
 			}
-		} else {
-			fmt.Println(err)
 		}
-	} else {
-		fmt.Println(err)
 	}
 	return
 }

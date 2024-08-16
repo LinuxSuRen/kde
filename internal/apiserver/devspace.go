@@ -36,7 +36,7 @@ import (
 
 type Server struct {
 	Client          *kubernetes.Clientset
-	KClient         *kdeClient.Clientset
+	KClient         kdeClient.Interface
 	DClient         dynamic.Interface
 	ExtClient       *apiextensionsclientset.Clientset
 	SystemNamespace string

@@ -37,6 +37,7 @@ import (
 	"github.com/linuxsuren/kde/api/linuxsuren.github.io/v1alpha1"
 	"github.com/linuxsuren/kde/pkg/core"
 	corev1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 )
 
 // DevSpaceReconciler reconciles a DevSpace object
@@ -101,13 +102,19 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 	setDefaultValueForGitPod(devSpace, config.Host)
 	devSpace.Annotations[v1alpha1.AnnoKeyServiceNamespace] = r.SystemNamespace
 	devSpace.Annotations[v1alpha1.AnnoKeyServiceName] = "apiserver"
-	configmap := turnTemplateToUnstructured(gitpodConfigMap, devSpace)
-	secret := turnTemplateToUnstructured(gitpodSecret, devSpace)
-	pvc := turnTemplateToUnstructured(gitpodPvc, devSpace)
-	deploy := turnTemplateToUnstructured(gitpodDeployment, devSpace)
-	service := turnTemplateToUnstructured(gitpodService, devSpace)
-	ingress := turnTemplateToUnstructured(gitpodIngress, devSpace)
-	exposeIngress := turnTemplateToUnstructured(gitpodExposeIngress, devSpace)
+	configmap, configmapErr := turnTemplateToUnstructured(gitpodConfigMap, devSpace)
+	secret, secretErr := turnTemplateToUnstructured(gitpodSecret, devSpace)
+	pvc, pvcErr := turnTemplateToUnstructured(gitpodPvc, devSpace)
+	deploy, deployErr := turnTemplateToUnstructured(gitpodDeployment, devSpace)
+	service, serviceErr := turnTemplateToUnstructured(gitpodService, devSpace)
+	ingress, ingressErr := turnTemplateToUnstructured(gitpodIngress, devSpace)
+	exposeIngress, exposeIngressErr := turnTemplateToUnstructured(gitpodExposeIngress, devSpace)
+
+	// check the object templates render result
+	if err = errors.Join(configmapErr, secretErr, pvcErr, deployErr, serviceErr, ingressErr, exposeIngressErr); err != nil {
+		r.Recorder.Event(devSpace, v1.EventTypeWarning, "Render", err.Error())
+		return
+	}
 
 	result.RequeueAfter = time.Minute
 
