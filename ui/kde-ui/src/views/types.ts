@@ -36,6 +36,9 @@ export interface DevSpace {
             password: string;
             email: string;
         },
+        auth: {
+            sshPrivateKey: string;
+        };
         services: {
             docker: {
                 enabled: boolean;
@@ -96,6 +99,9 @@ export function NewEmptyDevSpace() {
                 username: "",
                 password: "",
                 email: "",
+            },
+            auth: {
+                sshPrivateKey: "",
             },
             services: {
                 docker: {

@@ -89,6 +89,12 @@
                     Email:<el-input v-model="devspace.spec.repository.email" style="width: 240px;"/>
                 </td>
             </tr>
+            <tr>
+                <td>SSH Private Key</td>
+                <td>
+                    <el-input type="textarea" v-model="devspace.spec.auth.sshPrivateKey"/>
+                </td>
+            </tr>
         </table>
         <el-button type="primary" @click="submitForm">Submit</el-button>
     </el-form>

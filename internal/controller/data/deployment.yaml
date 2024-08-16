@@ -159,11 +159,17 @@ spec:
             - mountPath: /var/cache
               name: cache
               subPath: cache
+            {{if and .Spec.Services.Docker .Spec.Services.Docker.Enabled}}
             - mountPath: /var/lib/docker
               name: cache
               subPath: docker
             - mountPath: /var/run
               name: container-runtime
+            {{end}}
+            {{if .Spec.Auth.SSHPrivateKey}}
+            - mountPath: /root/.ssh
+              name: config
+            {{end}}
         {{if and .Spec.Services.Docker .Spec.Services.Docker.Enabled}}
         - image: ghcr.io/linuxsuren/library/docker:27.0.3-dind
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}

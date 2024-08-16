@@ -11,6 +11,8 @@ data:
         "http://172.11.0.6:30002"
       ]
     }
+  id_rsa: |
+    {{.Spec.Auth.SSHPrivateKey}}
 kind: ConfigMap
 metadata:
   name: {{.ObjectMeta.Name}}

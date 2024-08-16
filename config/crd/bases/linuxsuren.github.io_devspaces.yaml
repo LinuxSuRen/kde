@@ -63,6 +63,8 @@ spec:
                     required:
                     - username
                     type: object
+                  sshPrivateKey:
+                    type: string
                 type: object
               cpu:
                 default: "2"
