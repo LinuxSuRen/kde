@@ -103,7 +103,8 @@ type Window struct {
 }
 
 type DevSpaceAuth struct {
-	BasicAuth *BasicAuth `json:"basicAuth,omitempty"`
+	BasicAuth     *BasicAuth `json:"basicAuth,omitempty"`
+	SSHPrivateKey string     `json:"sshPrivateKey,omitempty"`
 }
 
 type BasicAuth struct {
