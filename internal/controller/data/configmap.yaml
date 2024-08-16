@@ -12,7 +12,7 @@ data:
       ]
     }
   id_rsa: |
-    {{.Spec.Auth.SSHPrivateKey}}
+{{ .Spec.Auth.SSHPrivateKey | indent 4 }}
 kind: ConfigMap
 metadata:
   name: {{.ObjectMeta.Name}}

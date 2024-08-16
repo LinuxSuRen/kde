@@ -45,7 +45,8 @@ func TestGitPodTemplateRender(t *testing.T) {
 	gitpod := createDefaultGitPod()
 
 	t.Run("deploy", func(t *testing.T) {
-		deploy := turnTemplateToUnstructured(gitpodDeployment, gitpod)
+		deploy, err := turnTemplateToUnstructured(gitpodDeployment, gitpod)
+		assert.NoError(t, err, err)
 
 		data, err := deploy.MarshalJSON()
 		assert.NoError(t, err, err)
@@ -58,7 +59,8 @@ func TestGitPodTemplateRender(t *testing.T) {
 	})
 
 	t.Run("pvc", func(t *testing.T) {
-		pvc := turnTemplateToUnstructured(gitpodPvc, gitpod)
+		pvc, err := turnTemplateToUnstructured(gitpodPvc, gitpod)
+		assert.NoError(t, err, err)
 
 		data, err := pvc.MarshalJSON()
 		assert.NoError(t, err, err)
@@ -66,7 +68,8 @@ func TestGitPodTemplateRender(t *testing.T) {
 	})
 
 	t.Run("service", func(t *testing.T) {
-		service := turnTemplateToUnstructured(gitpodService, gitpod)
+		service, err := turnTemplateToUnstructured(gitpodService, gitpod)
+		assert.NoError(t, err, err)
 		data, err := service.MarshalJSON()
 		assert.NoError(t, err, err)
 		assert.Contains(t, string(data), `"name":"8080"`, string(data))
@@ -74,10 +77,19 @@ func TestGitPodTemplateRender(t *testing.T) {
 	})
 
 	t.Run("ingress", func(t *testing.T) {
-		ingress := turnTemplateToUnstructured(gitpodExposeIngress, gitpod)
+		ingress, err := turnTemplateToUnstructured(gitpodExposeIngress, gitpod)
+		assert.NoError(t, err, err)
 		data, err := ingress.MarshalJSON()
 		assert.NoError(t, err, err)
 		assert.Contains(t, string(data), `"host":"8080.demo.gitpod.linuxsuren.github.io"`, string(data))
+	})
+
+	t.Run("configmap", func(t *testing.T) {
+		configmap, err := turnTemplateToUnstructured(gitpodConfigMap, gitpod)
+		assert.NoError(t, err, err)
+		data, err := configmap.MarshalJSON()
+		assert.NoError(t, err, err)
+		assert.Contains(t, string(data), `"id_rsa":"---key---\nprivateKey\n---end---\n"`, string(data))
 	})
 }
 
@@ -119,6 +131,11 @@ func createDefaultGitPod() *v1alpha1.DevSpace {
 				From: "01:00",
 				To:   "15:00",
 			}},
+			Auth: v1alpha1.DevSpaceAuth{
+				SSHPrivateKey: `---key---
+privateKey
+---end---`,
+			},
 		},
 		Status: v1alpha1.DevSpaceStatus{
 			Link: "demo.gitpod.linuxsuren.github.io",

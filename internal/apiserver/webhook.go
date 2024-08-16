@@ -40,7 +40,7 @@ func (s *Server) IDEWebhook(c *gin.Context) {
 		}
 
 		if err != nil {
-			c.JSON(http.StatusBadRequest, err)
+			c.JSON(httpStatus, err)
 		} else {
 			c.JSON(http.StatusOK, "")
 		}
@@ -81,11 +81,13 @@ func (s *Server) IDEWebhook(c *gin.Context) {
 			ports[i] = fmt.Sprintf("%d", port)
 		}
 		devspace.Annotations[v1alpha1.AnnoKeyExposePorts] = strings.Join(ports, ",")
-		if _, err = s.KClient.LinuxsurenV1alpha1().DevSpaces(ns).Update(ctx, devspace, metav1.UpdateOptions{}); err == nil {
-			// get the status of it
-			if devspace, err = s.KClient.LinuxsurenV1alpha1().DevSpaces(ns).Get(ctx, name, metav1.GetOptions{}); err == nil {
-				c.JSON(http.StatusOK, devspace.Status.ExposeLinks)
-			}
+		_, err = s.KClient.LinuxsurenV1alpha1().DevSpaces(ns).Update(ctx, devspace, metav1.UpdateOptions{})
+	}
+
+	// get the status of it
+	if err == nil {
+		if devspace, err = s.KClient.LinuxsurenV1alpha1().DevSpaces(ns).Get(ctx, name, metav1.GetOptions{}); err == nil {
+			c.JSON(http.StatusOK, devspace.Status.ExposeLinks)
 		}
 	}
 }
