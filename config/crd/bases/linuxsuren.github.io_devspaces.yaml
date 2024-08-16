@@ -113,6 +113,8 @@ spec:
                     default: master
                     description: Branch is the branch
                     type: string
+                  email:
+                    type: string
                   password:
                     description: Password is the password
                     type: string

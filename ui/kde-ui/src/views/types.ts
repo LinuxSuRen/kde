@@ -28,6 +28,14 @@ export interface DevSpace {
         storage: string;
         replicas: number;
         status: boolean; // a fake field which represents the replicas, 0 is off, 1 is on
+        envText: string; // a fake field which represents the env
+        repository: {
+            url: string;
+            branch: string;
+            username: string;
+            password: string;
+            email: string;
+        },
         services: {
             docker: {
                 enabled: boolean;
@@ -82,6 +90,13 @@ export function NewEmptyDevSpace() {
             image: "",
             storage: "",
             status: false,
+            repository: {
+                url: "",
+                branch: "",
+                username: "",
+                password: "",
+                email: "",
+            },
             services: {
                 docker: {
                     enabled: false,

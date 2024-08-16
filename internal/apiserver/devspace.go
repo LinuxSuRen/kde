@@ -35,10 +35,11 @@ import (
 )
 
 type Server struct {
-	Client    *kubernetes.Clientset
-	KClient   *kdeClient.Clientset
-	DClient   dynamic.Interface
-	ExtClient *apiextensionsclientset.Clientset
+	Client          *kubernetes.Clientset
+	KClient         *kdeClient.Clientset
+	DClient         dynamic.Interface
+	ExtClient       *apiextensionsclientset.Clientset
+	SystemNamespace string
 }
 
 func (s *Server) CreateDevSpace(c *gin.Context) {

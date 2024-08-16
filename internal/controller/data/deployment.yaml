@@ -84,8 +84,10 @@ spec:
                   cp /var/data/openvscode-server-back/data/Machine/settings.json /home/workspace/.openvscode-server/data/Machine/settings.json
               {{ if .Spec.Repository }}
               {{ if .Spec.Repository.Username }}
-              git config --global user.email {{.Spec.Repository.Username}}@ailinking.com
               git config --global user.name {{.Spec.Repository.Username}}
+              {{ end }}
+              {{ if .Spec.Repository.Email }}
+              git config --global user.email {{.Spec.Repository.Email}}
               {{ end }}
               git clone {{.Spec.Repository.URL}} --depth 1 --single-branch | exit 0
               {{ else }}
@@ -117,7 +119,7 @@ spec:
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: server
           env:
-            - name: GITPOD_VERSION
+            - name: DEVSPACE_VERSION
               value: "1"
           {{ range $key, $value := .Spec.Environment }}
             - name: {{ $key }}

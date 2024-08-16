@@ -79,6 +79,4 @@ jobs:
           go-version: 1.22
       - name: Test
         run: |
-          mkdir -p ui/kde-ui/dist
-          touch ui/kde-ui/dist/hello.txt
           make unit

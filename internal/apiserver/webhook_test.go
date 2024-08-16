@@ -23,28 +23,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
-	fakehttp "github.com/linuxsuren/kde/pkg/http"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRegisterStaticFileHandler(t *testing.T) {
-	t.Run("only register", func(t *testing.T) {
-		ginEngine := fakehttp.NewFakeGinEngine()
-		apiserver.RegisterStaticFilesHandle(ginEngine)
-	})
+func TestIDEWebhook(t *testing.T) {
+	t.Run("ns or name is empty", func(t *testing.T) {
+		engine := gin.New()
+		server := apiserver.Server{}
+		engine.POST("/webhook", server.IDEWebhook)
+		w := httptest.NewRecorder()
 
-	t.Run("real request", func(t *testing.T) {
-		apis := []string{
-			"/", "/index.html", "/favicon.ico", "/assets/a.img",
-		}
-		for _, api := range apis {
-			engine := gin.New()
-			apiserver.RegisterStaticFilesHandle(engine)
+		req, _ := http.NewRequest(http.MethodPost, "/webhook", nil)
+		engine.ServeHTTP(w, req)
 
-			w := httptest.NewRecorder()
-			req, _ := http.NewRequest(http.MethodGet, api, nil)
-			engine.ServeHTTP(w, req)
-			assert.Equal(t, http.StatusInternalServerError, w.Result().StatusCode, api)
-		}
+		assert.Equal(t, http.StatusBadRequest, w.Result().StatusCode)
 	})
 }

@@ -42,8 +42,9 @@ import (
 // DevSpaceReconciler reconciles a DevSpace object
 type DevSpaceReconciler struct {
 	client.Client
-	Scheme   *runtime.Scheme
-	Recorder record.EventRecorder
+	Scheme          *runtime.Scheme
+	Recorder        record.EventRecorder
+	SystemNamespace string
 	// inner fields
 	ctx context.Context
 	log logr.Logger
@@ -79,14 +80,14 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 	configCM := &corev1.ConfigMap{}
 	if cfgErr := r.Get(ctx, types.NamespacedName{
 		Name:      "config",
-		Namespace: req.Namespace,
+		Namespace: r.SystemNamespace,
 	}, configCM); cfgErr == nil {
-        if config, cfgErr = core.ReadConfigFromConfigMap(configCM); err != nil {
-            r.log.Error(cfgErr, "failed to parse config")
-        }
+		if config, cfgErr = core.ReadConfigFromConfigMap(configCM); err != nil {
+			r.log.Error(cfgErr, "failed to parse config")
+		}
 	} else {
-        r.log.Error(cfgErr, "failed to get config")
-    }
+		r.log.Error(cfgErr, "failed to get config")
+	}
 
 	setDefaultValueForGitPod(devSpace, config.Host)
 	devSpace = r.updateStatus(devSpace)
@@ -98,6 +99,8 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 		return
 	}
 	setDefaultValueForGitPod(devSpace, config.Host)
+	devSpace.Annotations[v1alpha1.AnnoKeyServiceNamespace] = r.SystemNamespace
+	devSpace.Annotations[v1alpha1.AnnoKeyServiceName] = "apiserver"
 	configmap := turnTemplateToUnstructured(gitpodConfigMap, devSpace)
 	secret := turnTemplateToUnstructured(gitpodSecret, devSpace)
 	pvc := turnTemplateToUnstructured(gitpodPvc, devSpace)
@@ -136,19 +139,19 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 	return
 }
 
-func setDefaultValueForGitPod(gitpod *v1alpha1.DevSpace, ingress string) {
-	if gitpod.Spec.Image == "" {
-		gitpod.Spec.Image = "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
+func setDefaultValueForGitPod(devspace *v1alpha1.DevSpace, ingress string) {
+	if devspace.Spec.Image == "" {
+		devspace.Spec.Image = "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
 	}
-	if gitpod.Spec.Host == "" {
-		gitpod.Spec.Host = ingress
+	if devspace.Spec.Host == "" {
+		devspace.Spec.Host = ingress
 	}
 
-	if gitpod.Annotations == nil {
-		gitpod.Annotations = map[string]string{}
+	if devspace.Annotations == nil {
+		devspace.Annotations = map[string]string{}
 	}
-	if policy := gitpod.Annotations[v1alpha1.AnnoKeyImagePullPolicy]; policy != PolicyAlways {
-		gitpod.Annotations[v1alpha1.AnnoKeyImagePullPolicy] = PolicyIfNotPresent
+	if policy := devspace.Annotations[v1alpha1.AnnoKeyImagePullPolicy]; policy != PolicyAlways {
+		devspace.Annotations[v1alpha1.AnnoKeyImagePullPolicy] = PolicyIfNotPresent
 	}
 }
 

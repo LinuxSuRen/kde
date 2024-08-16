@@ -120,6 +120,7 @@ type GitRepository struct {
 	Username string `json:"username"`
 	// Password is the password
 	Password string `json:"password,omitempty"`
+	Email    string `json:"email,omitempty"`
 }
 
 // DevSpaceStatus defines the observed state of DevSpace
@@ -180,6 +181,8 @@ const (
 	AnnoKeyIngressMode      = "linuxsuren.github.io/ingress-mode"
 	AnnoKeyBasicAuth        = "linuxsuren.github.io/basic-auth"
 	AnnoKeyMaintainMode     = "linuxsuren.github.io/maintain-mode"
+	AnnoKeyServiceName      = "linuxsuren.github.io/service-name"
+	AnnoKeyServiceNamespace = "linuxsuren.github.io/service-namespace"
 )
 
 func init() {
