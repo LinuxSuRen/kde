@@ -23,17 +23,32 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/linuxsuren/kde/pkg/core"
 	ginhttp "github.com/linuxsuren/kde/pkg/http"
-
-	kdeui "github.com/linuxsuren/kde/ui/kde-ui"
 )
 
+var errNoStaticFiles = fmt.Errorf("cannot find static files")
+
 func handleStaticFilesRequest(c *gin.Context) {
+	readerInter, ok := c.Keys["reader"]
+	if !ok {
+		c.Error(fmt.Errorf("no file reader found in the context"))
+		c.JSON(http.StatusInternalServerError, errNoStaticFiles)
+		return
+	}
+
+	reader, ok := readerInter.(core.FileReader)
+	if !ok {
+		c.Error(fmt.Errorf("invalid file reader type in the context"))
+		c.JSON(http.StatusInternalServerError, errNoStaticFiles)
+		return
+	}
+
 	staticFilePath := c.Request.URL.Path
 	if staticFilePath == "/" {
 		staticFilePath = "index.html"
 	}
-	data, err := kdeui.GetFile(filepath.Join("dist", staticFilePath))
+	data, err := reader.GetFile(filepath.Join("dist", staticFilePath))
 	if err == nil {
 		switch {
 		case strings.HasSuffix(staticFilePath, ".js"):

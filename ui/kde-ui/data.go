@@ -18,11 +18,20 @@ package kdeui
 
 import (
 	"embed"
+
+	"github.com/linuxsuren/kde/pkg/core"
 )
 
 //go:embed dist/*
 var fs embed.FS
 
-func GetFile(name string) (data []byte, err error) {
+type embedReader struct {
+}
+
+func NewembedReader() core.FileReader {
+	return &embedReader{}
+}
+
+func (r *embedReader) GetFile(name string) (data []byte, err error) {
 	return fs.ReadFile(name)
 }

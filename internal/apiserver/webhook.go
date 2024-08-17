@@ -34,6 +34,8 @@ func (s *Server) IDEWebhook(c *gin.Context) {
 	var devspace *v1alpha1.DevSpace
 	var err error
 	var httpStatus int
+	var result interface{}
+	result = ""
 	defer func() {
 		if httpStatus == 0 {
 			httpStatus = http.StatusBadRequest
@@ -42,7 +44,7 @@ func (s *Server) IDEWebhook(c *gin.Context) {
 		if err != nil {
 			c.JSON(httpStatus, err)
 		} else {
-			c.JSON(http.StatusOK, "")
+			c.JSON(http.StatusOK, result)
 		}
 	}()
 
@@ -87,7 +89,7 @@ func (s *Server) IDEWebhook(c *gin.Context) {
 	// get the status of it
 	if err == nil {
 		if devspace, err = s.KClient.LinuxsurenV1alpha1().DevSpaces(ns).Get(ctx, name, metav1.GetOptions{}); err == nil {
-			c.JSON(http.StatusOK, devspace.Status.ExposeLinks)
+			result = devspace.Status.ExposeLinks
 		}
 	}
 }

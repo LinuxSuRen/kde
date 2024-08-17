@@ -20,4 +20,5 @@ import "github.com/gin-gonic/gin"
 
 type GinEngine interface {
 	GET(relativePath string, handlers ...gin.HandlerFunc) gin.IRoutes
+	Use(middleware ...gin.HandlerFunc) gin.IRoutes
 }

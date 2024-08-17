@@ -22,6 +22,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
 	kdeClient "github.com/linuxsuren/kde/pkg/client/clientset/versioned"
+	kdeui "github.com/linuxsuren/kde/ui/kde-ui"
 	"github.com/spf13/cobra"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/client-go/dynamic"
@@ -96,7 +97,9 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 	}
 
 	r := gin.Default()
-	apiserver.RegisterStaticFilesHandle(r)
+	apiserver.RegisterStaticFilesHandle(r.Use(func(ctx *gin.Context) {
+		ctx.Set("reader", kdeui.NewembedReader())
+	}))
 	if err = apiserver.RegisterOAuth(r, o.providerName, o.clientID, o.clientSecret); err != nil {
 		return
 	}
