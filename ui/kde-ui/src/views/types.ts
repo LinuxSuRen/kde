@@ -143,3 +143,24 @@ export interface Config {
     host: string;
     languages: Language[];
 }
+
+export interface Cluster {
+    nodes: ClusterNode[];
+}
+
+export interface ClusterNode {
+    name: string;
+    arch: string;
+    containerRuntime: string;
+    os: string;
+    osImage: string;
+    allocatable: NodeResource;
+    capacity: NodeResource;
+}
+
+export interface NodeResource {
+    cpu: string;
+    memory: string;
+    storageEphemeral: string;
+    pods: string;
+}

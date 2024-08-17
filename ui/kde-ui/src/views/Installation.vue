@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ElNotification } from 'element-plus';
 import { reactive, ref, watch } from 'vue';
-import type { Config } from './types';
+import type { Config, Cluster } from './types';
 
 const tabActive = ref('Install')
 watch(tabActive, () => {
@@ -9,6 +9,8 @@ watch(tabActive, () => {
         loadInstanceStatusData()
     } else if (tabActive.value === 'Configuration') {
         loadConfig()
+    } else if (tabActive.value === 'Cluster') {
+        loadClusterInfo()
     }
 })
 
@@ -142,6 +144,19 @@ const updateConfig = () => {
         }
     })
 }
+
+const clusterInfoLoading = ref(true)
+const clusterInfo = ref({} as Cluster)
+const loadClusterInfo = () => {
+    clusterInfoLoading.value = true
+    fetch(`/api/cluster/info`, {
+        method: 'GET'
+    }).then(res => res.json()).then(d => {
+        clusterInfo.value = d
+    }).finally(() => {
+        clusterInfoLoading.value = false
+    })
+}
 </script>
 
 <template>
@@ -224,6 +239,45 @@ const updateConfig = () => {
                         <el-button type="primary" @click="updateConfig">Submit</el-button>
                     </el-form-item>
                 </el-form>
+            </el-tab-pane>
+            <el-tab-pane name="Cluster">
+                <template #label>
+                    <span class="custom-tabs-label">
+                        <span>Cluster</span>
+                    </span>
+                </template>
+                <div>
+                    Nodes: {{ clusterInfo?.nodes?.length }}
+                </div>
+                <div v-for="node in clusterInfo.nodes" :key="node.name">
+                    <div>
+                        Name: {{ node.name }}
+                    </div>
+                    <div>
+                        OS: {{ node.os }}
+                    </div>
+                    <div>
+                        OSImage: {{ node.osImage }}
+                    </div>
+                    <div>
+                        Arch: {{ node.arch }}
+                    </div>
+                    <div>
+                        ContainerRuntime: {{ node.containerRuntime }}
+                    </div>
+                    <div>
+                        CPU: {{ node.allocatable.cpu }}/{{ node.capacity.cpu }}
+                    </div>
+                    <div>
+                        Memory: {{ node.allocatable.memory }}/{{ node.capacity.memory }}
+                    </div>
+                    <div>
+                        Storage: {{ node.allocatable.storageEphemeral }}/{{ node.capacity.storageEphemeral }}
+                    </div>
+                    <div>
+                        Pods: {{ node.allocatable.pods }}/{{ node.capacity.pods }}
+                    </div>
+                </div>
             </el-tab-pane>
         </el-tabs>
     </div>
