@@ -69,8 +69,14 @@ func CleanInvalidLanguages(languages []Language) []Language {
 				languages = append(languages[:i], languages[i+1:]...)
 			}
 		} else {
-            i++
-        }
+			i++
+		}
 	}
 	return languages
 }
+
+type FileReader interface {
+	GetFile(name string) (data []byte, err error)
+}
+
+const FileReaderContext = "reader"

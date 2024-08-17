@@ -101,7 +101,8 @@ func TestIDEWebhook(t *testing.T) {
 		req, _ := http.NewRequest(http.MethodPost, "/webhook?namespace=default&devspace=fake", payload)
 		engine.ServeHTTP(w, req)
 
-		assert.Equal(t, http.StatusOK, w.Result().StatusCode, w.Body)
+		assert.Equal(t, http.StatusOK, w.Result().StatusCode)
+		assert.Equal(t, `[{"link":"example.com","port":8080}]`, w.Body.String())
 	})
 }
 

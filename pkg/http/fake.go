@@ -28,3 +28,7 @@ func (f *fakeGinEngine) GET(relativePath string, handlers ...gin.HandlerFunc) gi
 	// no need to implement
 	return nil
 }
+
+func (f *fakeGinEngine) Use(middleware ...gin.HandlerFunc) gin.IRoutes {
+	return nil
+}

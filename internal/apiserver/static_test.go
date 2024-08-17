@@ -23,6 +23,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/linuxsuren/kde/internal/apiserver"
+	"github.com/linuxsuren/kde/pkg/core"
 	fakehttp "github.com/linuxsuren/kde/pkg/http"
 	"github.com/stretchr/testify/assert"
 )
@@ -36,15 +37,51 @@ func TestRegisterStaticFileHandler(t *testing.T) {
 	t.Run("real request", func(t *testing.T) {
 		apis := []string{
 			"/", "/index.html", "/favicon.ico", "/assets/a.img",
+			"/assets/index.js", "/assets/index.css", "/assets/demo.png",
+			"/assets/demo.svg",
 		}
 		for _, api := range apis {
 			engine := gin.New()
+			engine.Use(func(ctx *gin.Context) {
+				ctx.Set(core.FileReaderContext, &fakeReader{})
+			})
 			apiserver.RegisterStaticFilesHandle(engine)
 
 			w := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodGet, api, nil)
 			engine.ServeHTTP(w, req)
-			assert.Equal(t, http.StatusInternalServerError, w.Result().StatusCode, api)
+			assert.Equal(t, http.StatusOK, w.Result().StatusCode, api)
 		}
 	})
+
+	t.Run("no reader in context", func(t *testing.T) {
+		engine := gin.New()
+		apiserver.RegisterStaticFilesHandle(engine)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		engine.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusInternalServerError, w.Result().StatusCode)
+	})
+
+	t.Run("invalid reader in context", func(t *testing.T) {
+		engine := gin.New()
+		engine.Use(func(ctx *gin.Context) {
+			ctx.Set(core.FileReaderContext, "")
+		})
+		apiserver.RegisterStaticFilesHandle(engine)
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest(http.MethodGet, "/", nil)
+		engine.ServeHTTP(w, req)
+		assert.Equal(t, http.StatusInternalServerError, w.Result().StatusCode)
+	})
+}
+
+type fakeReader struct {
+}
+
+func (r *fakeReader) GetFile(name string) (data []byte, err error) {
+	data = []byte("")
+	return
 }
