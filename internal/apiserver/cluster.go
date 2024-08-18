@@ -38,7 +38,7 @@ func (s *Server) ClusterInfo(c *gin.Context) {
 		Nodes: make([]ClusterNode, 0, len(nodeList.Items)),
 	}
 
-	nodeMetrics, err := s.MetricClient.NodeMetricses().List(ctx, metav1.ListOptions{})
+	nodeMetrics, err := s.MetricClient.MetricsV1beta1().NodeMetricses().List(ctx, metav1.ListOptions{})
 	cluster.Message = fmt.Sprintf("%v", err)
 	if nodeMetrics == nil {
 		nodeMetrics = &metricv1beta1.NodeMetricsList{}

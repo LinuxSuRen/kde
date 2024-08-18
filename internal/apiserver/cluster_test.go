@@ -27,6 +27,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/fake"
+	metricv1beta1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"
+	metricfake "k8s.io/metrics/pkg/client/clientset/versioned/fake"
 )
 
 func TestClusterInfo(t *testing.T) {
@@ -41,6 +43,16 @@ func TestClusterInfo(t *testing.T) {
 					Architecture:            "amd64",
 					ContainerRuntimeVersion: "containerd://1.6.4",
 					OperatingSystem:         "linux",
+				},
+			},
+		}),
+		MetricClient: metricfake.NewSimpleClientset(&metricv1beta1.NodeMetricsList{
+			Items: []metricv1beta1.NodeMetrics{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "node-1",
+					},
+					Usage: corev1.ResourceList{},
 				},
 			},
 		}),
