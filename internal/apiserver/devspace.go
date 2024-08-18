@@ -32,6 +32,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
+	metricv1beta1 "k8s.io/metrics/pkg/client/clientset/versioned/typed/metrics/v1beta1"
 )
 
 type Server struct {
@@ -39,6 +40,7 @@ type Server struct {
 	KClient         kdeClient.Interface
 	DClient         dynamic.Interface
 	ExtClient       apiextensionsclientset.Interface
+	MetricClient    metricv1beta1.MetricsV1beta1Interface
 	SystemNamespace string
 }
 

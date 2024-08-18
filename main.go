@@ -29,6 +29,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	metricv1beta1 "k8s.io/metrics/pkg/client/clientset/versioned/typed/metrics/v1beta1"
 )
 
 func main() {
@@ -88,11 +89,17 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	var metricClient *metricv1beta1.MetricsV1beta1Client
+	if metricClient, err = metricv1beta1.NewForConfig(config); err != nil {
+		return
+	}
+
 	server := &apiserver.Server{
 		Client:          clientset,
 		KClient:         kClient,
 		DClient:         dyClient,
 		ExtClient:       extClient,
+		MetricClient:    metricClient,
 		SystemNamespace: o.systemNamespace,
 	}
 
