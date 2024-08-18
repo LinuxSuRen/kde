@@ -124,5 +124,6 @@ func (o *option) runE(cmd *cobra.Command, args []string) {
 	authorizedAPI.GET("/images", server.Images)
 	authorizedAPI.GET("/config", server.GetConfig)
 	authorizedAPI.PUT("/config", server.UpdateConfig)
+	authorizedAPI.GET("/cluster/info", server.ClusterInfo)
 	r.Run(o.address)
 }

@@ -40,6 +40,7 @@ type DevSpacePodPodReconciler struct {
 // +kubebuilder:rbac:groups="",resources=configmaps,verbs=get;list;delete;create;update;watch
 // +kubebuilder:rbac:groups="",resources=services,verbs=get;list;delete;create;update
 // +kubebuilder:rbac:groups="",resources=serviceaccounts,verbs=get;list;delete;create;update
+// +kubebuilder:rbac:groups="",resources=nodes,verbs=get;list;watch
 // +kubebuilder:rbac:groups="apps",resources=deployments,verbs=get;list;delete;create;update
 // +kubebuilder:rbac:groups="apiextensions.k8s.io",resources=namespaces,verbs=get;list;delete;create;update
 // +kubebuilder:rbac:groups="apiextensions.k8s.io",resources=customresourcedefinitions,verbs=get;list;delete;create;update
