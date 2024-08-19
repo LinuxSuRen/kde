@@ -29,6 +29,10 @@ export interface DevSpace {
         replicas: number;
         status: boolean; // a fake field which represents the replicas, 0 is off, 1 is on
         envText: string; // a fake field which represents the env
+        hostAliases: {
+            hostnames: string[];
+            ip: string;
+        }[];
         repository: {
             url: string;
             branch: string;
