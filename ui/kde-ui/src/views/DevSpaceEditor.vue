@@ -86,13 +86,36 @@
                 <td>Git Setting</td>
                 <td>
                     Username:<el-input v-model="devspace.spec.repository.username" style="width: 240px;"/>
-                    Email:<el-input v-model="devspace.spec.repository.email" style="width: 240px;"/>
+                    Email:<el-input v-model="devspace.spec.repository.email" style="width: 280px;"/>
                 </td>
             </tr>
             <tr>
                 <td>SSH Private Key</td>
                 <td>
                     <el-input type="textarea" v-model="devspace.spec.auth.sshPrivateKey"/>
+                </td>
+            </tr>
+            <tr>
+                <td>IP Host Mapping</td>
+                <td>
+                    <el-button type="primary" @click="addHostAlias">Add</el-button>
+                    <el-table :data="devspace.spec.hostAliases">
+                        <el-table-column prop="ip" label="IP">
+                            <template #default="scope">
+                                <el-input v-model="scope.row.ip" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="hostnames" label="Hostnames">
+                            <template #default="scope">
+                                <el-input v-model="scope.row.hostnames[0]" />
+                            </template>
+                        </el-table-column>
+                        <el-table-column label="Action">
+                            <template #default="scope">
+                                <el-button type="danger" @click="removeHostAlias(scope.$index)">Remove</el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
                 </td>
             </tr>
         </table>
@@ -194,5 +217,18 @@ const submitForm = () => {
             plain: true,
         })
     })
+}
+
+const addHostAlias = () => {
+    if (!devspace.value.spec.hostAliases) {
+        devspace.value.spec.hostAliases = []
+    }
+    devspace.value.spec.hostAliases.push({
+        ip: "",
+        hostnames: [""]
+    })
+}
+const removeHostAlias = (index: number) => {
+    devspace.value.spec.hostAliases.splice(index, 1)
 }
 </script>
