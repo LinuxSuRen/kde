@@ -266,5 +266,5 @@ spec:
           emptyDir: {}
         - name: config
           configMap:
-            defaultMode: 600
+            defaultMode: 0600
             name: {{.ObjectMeta.Name}}
