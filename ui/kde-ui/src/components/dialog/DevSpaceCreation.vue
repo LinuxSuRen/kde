@@ -39,18 +39,11 @@ const createDevSpace = async (devSpace: DevSpace) => {
               "apiVersion": "linuxsuren.github.io/v1alpha1",
               "kind": "DevSpace",
               "metadata": {
-                "name": "${devSpace.name}",
-                "annotations": {
-                  "storageTemporary1": "a",
-                  "ingressMode": "path1",
-                  "volumeMode": "Filesystem",
-                  "storageClassName1": "rook-cephfs"
-                }
+                "name": "${devSpace.name}"
               },
               "spec": {
                 "cpu": "${devSpace.cpu}",
                 "memory": "${devSpace.memory}",
-                "host": "devspace.jenkins-zh.cn",
                 "image": "${devSpace.image}",
                 "services": {}
               }

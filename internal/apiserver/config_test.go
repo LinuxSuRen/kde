@@ -36,15 +36,21 @@ func TestSetDefaultConfig(t *testing.T) {
 	}
 
 	t.Run("annotations are empty", func(t *testing.T) {
-		devspace := &v1alpha1.DevSpace{}
+		devspace := &v1alpha1.DevSpace{
+			Spec: v1alpha1.DevSpaceSpec{
+				Host: "localhost",
+			},
+		}
 		config := &core.Config{
 			ImagePullPolicy:  "Always",
 			StorageClassName: "standard",
 			VolumeAccessMode: "ReadWriteOnce",
 			VolumeMode:       "Filesystem",
 			IngressMode:      "nginx",
+			Host:             "another",
 		}
 		verify(t, devspace, config)
+		assert.Equal(t, "localhost", devspace.Spec.Host)
 	})
 
 	t.Run("annotations are not empty", func(t *testing.T) {
@@ -62,7 +68,9 @@ func TestSetDefaultConfig(t *testing.T) {
 			VolumeAccessMode: "ReadWriteMany",
 			VolumeMode:       "Block",
 			IngressMode:      "traefik",
+			Host:             "another",
 		}
 		verify(t, devspace, config)
+		assert.Equal(t, "another", devspace.Spec.Host)
 	})
 }

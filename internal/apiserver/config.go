@@ -50,8 +50,8 @@ func (s *Server) UpdateConfig(c *gin.Context) {
 		return
 	}
 
-    // clean invalid languages
-    config.Languages = core.CleanInvalidLanguages(config.Languages)
+	// clean invalid languages
+	config.Languages = core.CleanInvalidLanguages(config.Languages)
 
 	cm := getConfigMap("config.yaml")
 	cm.SetNamespace(namespace)
@@ -93,5 +93,8 @@ func setDefaultConfig(devspace *v1alpha1.DevSpace, config *core.Config) {
 	}
 	if _, ok := devspace.Annotations[v1alpha1.AnnoKeyIngressMode]; !ok {
 		devspace.Annotations[v1alpha1.AnnoKeyIngressMode] = config.IngressMode
+	}
+	if devspace.Spec.Host == "" {
+		devspace.Spec.Host = config.Host
 	}
 }

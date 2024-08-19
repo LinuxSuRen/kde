@@ -218,10 +218,15 @@ const loadClusterInfo = () => {
                         <el-input v-model="config.ingressMode" />
                     </el-form-item>
                     <el-form-item label="VolumeAccessMode">
-                        <el-input v-model="config.volumeAccessMode" />
+                        <el-select v-model="config.volumeAccessMode">
+                            <el-option label="ReadWriteMany" value="ReadWriteMany" />
+                            <el-option label="ReadWriteOnce" value="ReadWriteOnce" />
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="VolumeMode">
-                        <el-input v-model="config.volumeMode" />
+                        <el-select v-model="config.volumeMode">
+                            <el-option label="Filesystem" value="Filesystem" />
+                        </el-select>
                     </el-form-item>
                     <el-form-item label="StorageClassName">
                         <el-input v-model="config.storageClassName" />
