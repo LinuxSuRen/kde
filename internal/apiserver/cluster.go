@@ -17,8 +17,12 @@ limitations under the License.
 package apiserver
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metricv1beta1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"
 )
 
 func (s *Server) ClusterInfo(c *gin.Context) {
@@ -33,47 +37,66 @@ func (s *Server) ClusterInfo(c *gin.Context) {
 	cluster := Cluster{
 		Nodes: make([]ClusterNode, 0, len(nodeList.Items)),
 	}
+
+	nodeMetrics, err := s.MetricClient.MetricsV1beta1().NodeMetricses().List(ctx, metav1.ListOptions{})
+	cluster.Message = fmt.Sprintf("%v", err)
+	if nodeMetrics == nil {
+		nodeMetrics = &metricv1beta1.NodeMetricsList{}
+	}
+
 	for _, node := range nodeList.Items {
-		cluster.Nodes = append(cluster.Nodes, ClusterNode{
+		clusterNode := ClusterNode{
 			Name:             node.Name,
 			Arch:             node.Status.NodeInfo.Architecture,
 			ContaienrRuntime: node.Status.NodeInfo.ContainerRuntimeVersion,
 			OS:               node.Status.NodeInfo.OperatingSystem,
 			OSImage:          node.Status.NodeInfo.OSImage,
-			Allocatable: NodeResource{
-				CPU:              node.Status.Allocatable.Cpu().String(),
-				Memory:           node.Status.Allocatable.Memory().String(),
-				StorageEphemeral: node.Status.Allocatable.StorageEphemeral().String(),
-				Pods:             int(node.Status.Allocatable.Pods().Value()),
-			},
-			Capacity: NodeResource{
-				CPU:              node.Status.Capacity.Cpu().String(),
-				Memory:           node.Status.Capacity.Memory().String(),
-				StorageEphemeral: node.Status.Capacity.StorageEphemeral().String(),
-				Pods:             int(node.Status.Capacity.Pods().Value()),
-			},
-		})
+			Allocatable:      resourceListToNodeResource(node.Status.Allocatable),
+			Capacity:         resourceListToNodeResource(node.Status.Capacity),
+			Images:           node.Status.Images,
+		}
+
+		for _, nodeMetric := range nodeMetrics.Items {
+			if nodeMetric.Name == node.Name {
+				clusterNode.Usage = resourceListToNodeResource(nodeMetric.Usage)
+				break
+			}
+		}
+
+		cluster.Nodes = append(cluster.Nodes, clusterNode)
 	}
 	c.JSON(200, cluster)
 }
 
+func resourceListToNodeResource(res corev1.ResourceList) NodeResource {
+	return NodeResource{
+		CPU:              res.Cpu().String(),
+		Memory:           res.Memory().String(),
+		StorageEphemeral: res.StorageEphemeral().String(),
+		Pods:             res.Pods().Value(),
+	}
+}
+
 type Cluster struct {
-	Nodes []ClusterNode `json:"nodes"`
+	Nodes   []ClusterNode `json:"nodes"`
+	Message string        `json:"message"`
 }
 
 type ClusterNode struct {
-	Name             string       `json:"name"`
-	Arch             string       `json:"arch"`
-	ContaienrRuntime string       `json:"containerRuntime"`
-	OS               string       `json:"os"`
-	OSImage          string       `json:"osImage"`
-	Allocatable      NodeResource `json:"allocatable"`
-	Capacity         NodeResource `json:"capacity"`
+	Name             string                  `json:"name"`
+	Arch             string                  `json:"arch"`
+	ContaienrRuntime string                  `json:"containerRuntime"`
+	OS               string                  `json:"os"`
+	OSImage          string                  `json:"osImage"`
+	Allocatable      NodeResource            `json:"allocatable"`
+	Capacity         NodeResource            `json:"capacity"`
+	Usage            NodeResource            `json:"usage"`
+	Images           []corev1.ContainerImage `json:"images,omitempty"`
 }
 
 type NodeResource struct {
 	CPU              string `json:"cpu"`
 	Memory           string `json:"memory"`
 	StorageEphemeral string `json:"storageEphemeral"`
-	Pods             int    `json:"pods"`
+	Pods             int64  `json:"pods"`
 }

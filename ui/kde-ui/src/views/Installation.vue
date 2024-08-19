@@ -246,38 +246,24 @@ const loadClusterInfo = () => {
                         <span>Cluster</span>
                     </span>
                 </template>
-                <div>
-                    Nodes: {{ clusterInfo?.nodes?.length }}
-                </div>
-                <div v-for="node in clusterInfo.nodes" :key="node.name">
-                    <div>
-                        Name: {{ node.name }}
-                    </div>
-                    <div>
-                        OS: {{ node.os }}
-                    </div>
-                    <div>
-                        OSImage: {{ node.osImage }}
-                    </div>
-                    <div>
-                        Arch: {{ node.arch }}
-                    </div>
-                    <div>
-                        ContainerRuntime: {{ node.containerRuntime }}
-                    </div>
-                    <div>
-                        CPU: {{ node.allocatable.cpu }}/{{ node.capacity.cpu }}
-                    </div>
-                    <div>
-                        Memory: {{ node.allocatable.memory }}/{{ node.capacity.memory }}
-                    </div>
-                    <div>
-                        Storage: {{ node.allocatable.storageEphemeral }}/{{ node.capacity.storageEphemeral }}
-                    </div>
-                    <div>
-                        Pods: {{ node.allocatable.pods }}/{{ node.capacity.pods }}
-                    </div>
-                </div>
+                <el-table :data="clusterInfo.nodes" style="width: 100%">
+                    <el-table-column prop="name" label="Name" />
+                    <el-table-column prop="os" label="OS">
+                        <template #default="scope">
+                            {{ scope.row.os }}/{{ scope.row.osImage }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="arch" label="Arch" />
+                    <el-table-column prop="containerRuntime" label="ContainerRuntime" />
+                    <el-table-column prop="allocatable.cpu" label="CPU" />
+                    <el-table-column prop="allocatable.memory" label="Memory" />
+                    <el-table-column prop="allocatable.pods" label="Pods" />
+                    <el-table-column prop="images" label="Images">
+                        <template #default="scope">
+                            {{ scope.row.images.length }}
+                        </template>
+                    </el-table-column>
+                </el-table>
             </el-tab-pane>
         </el-tabs>
     </div>
