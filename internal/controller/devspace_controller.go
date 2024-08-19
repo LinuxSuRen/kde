@@ -90,7 +90,7 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 		r.log.Error(cfgErr, "failed to get config")
 	}
 
-	setDefaultValueForGitPod(devSpace, config.Host)
+	setDefaultValueForDevSpace(devSpace, config.Host)
 	devSpace = r.updateStatus(devSpace)
 
 	_ = r.Status().Update(ctx, devSpace.DeepCopy())
@@ -99,7 +99,7 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 		err = client.IgnoreNotFound(err)
 		return
 	}
-	setDefaultValueForGitPod(devSpace, config.Host)
+	setDefaultValueForDevSpace(devSpace, config.Host)
 	devSpace.Annotations[v1alpha1.AnnoKeyServiceNamespace] = r.SystemNamespace
 	devSpace.Annotations[v1alpha1.AnnoKeyServiceName] = "apiserver"
 	configmap, configmapErr := turnTemplateToUnstructured(gitpodConfigMap, devSpace)
@@ -146,7 +146,7 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 	return
 }
 
-func setDefaultValueForGitPod(devspace *v1alpha1.DevSpace, ingress string) {
+func setDefaultValueForDevSpace(devspace *v1alpha1.DevSpace, ingress string) {
 	if devspace.Spec.Image == "" {
 		devspace.Spec.Image = "ghcr.io/linuxsuren/openvscode-server-full:v0.0.8"
 	}
