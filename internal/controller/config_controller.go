@@ -76,7 +76,7 @@ func (r *configReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 		return
 	}
 
-    ingress.SetNamespace(cm.Namespace)
+	ingress.SetNamespace(cm.Namespace)
 	ingressKey := client.ObjectKeyFromObject(ingress)
 	r.log.Info("start to update ingress", "key", ingressKey)
 	if err = r.Get(ctx, ingressKey, ingress); err != nil {
@@ -84,9 +84,11 @@ func (r *configReconciler) Reconcile(ctx context.Context, req ctrl.Request) (res
 		return
 	}
 
-	if len(ingress.Spec.Rules) > 0 && ingress.Spec.Rules[0].Host != configObj.Host {
-		ingress.Spec.Rules[0].Host = configObj.Host
-		err = r.Update(ctx, ingress)
+	if len(ingress.Spec.Rules) > 0 {
+		if ingress.Spec.Rules[0].Host != configObj.Host {
+			ingress.Spec.Rules[0].Host = configObj.Host
+			err = r.Update(ctx, ingress)
+		}
 	}
 	return
 }

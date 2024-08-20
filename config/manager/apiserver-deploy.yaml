@@ -1,23 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: apiserver
+  name: kde-apiserver
   namespace: system
   labels:
-    control-plane: apiserver
+    control-plane: kde-apiserver
     app.kubernetes.io/name: kde
     app.kubernetes.io/managed-by: kustomize
 spec:
   selector:
     matchLabels:
-      control-plane: apiserver
+      control-plane: kde-apiserver
+      app.kubernetes.io/name: kde
   replicas: 1
   template:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: server
       labels:
-        control-plane: apiserver
+        control-plane: kde-apiserver
+        app.kubernetes.io/name: kde
     spec:
       securityContext:
         runAsNonRoot: true
@@ -50,5 +52,5 @@ spec:
           requests:
             cpu: 10m
             memory: 64Mi
-      serviceAccountName: controller-manager
+      serviceAccountName: kde-controller
       terminationGracePeriodSeconds: 10

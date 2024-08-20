@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: apiserver
+  name: kde-apiserver
   namespace: system
 spec:
   ingressClassName: nginx
@@ -10,7 +10,7 @@ spec:
         paths:
           - backend:
               service:
-                name: apiserver
+                name: kde-apiserver
                 port:
                   number: 8080
             path: /
