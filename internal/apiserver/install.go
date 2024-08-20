@@ -68,6 +68,12 @@ func (s *Server) Install(c *gin.Context) {
 	if namespace == "" {
 		namespace = s.SystemNamespace
 	}
+	_, nsErr := s.Client.CoreV1().Namespaces().Create(ctx, &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: namespace,
+		},
+	}, metav1.CreateOptions{})
+
 	crdDevSpace := getCRD("linuxsuren.github.io_devspaces.yaml")
 	_, crdDevSpaceErr := s.ExtClient.ApiextensionsV1().CustomResourceDefinitions().Create(ctx, crdDevSpace, metav1.CreateOptions{})
 
@@ -117,7 +123,7 @@ func (s *Server) Install(c *gin.Context) {
 	ingress.SetNamespace(namespace)
 	_, ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Create(ctx, ingress, metav1.CreateOptions{})
 
-	err = errors.Join(client.IgnoreAlreadyExists(crdDevSpaceErr), client.IgnoreAlreadyExists(crdUserErr),
+	err = errors.Join(client.IgnoreAlreadyExists(crdDevSpaceErr), client.IgnoreAlreadyExists(crdUserErr), client.IgnoreAlreadyExists(nsErr),
 		client.IgnoreAlreadyExists(saErr), client.IgnoreNotFound(clusterRoleErr), client.IgnoreNotFound(clusterRoleBindingErr),
 		client.IgnoreAlreadyExists(cmErr),
 		client.IgnoreAlreadyExists(deployErr), client.IgnoreAlreadyExists(apiserverDeployErr),
@@ -164,11 +170,13 @@ func (s *Server) Uninstall(c *gin.Context) {
 	ingress := getIngress("ingress.yaml")
 	ingressErr := s.Client.NetworkingV1().Ingresses(namespace).Delete(ctx, ingress.GetName(), metav1.DeleteOptions{})
 
+	nsErr := s.Client.CoreV1().Namespaces().Delete(ctx, namespace, metav1.DeleteOptions{})
+
 	err := errors.Join(client.IgnoreNotFound(crdDevSpaceErr), client.IgnoreNotFound(crdUserErr),
 		client.IgnoreNotFound(saErr), client.IgnoreNotFound(clusterRoleErr), client.IgnoreNotFound(clusterRoleBindingErr),
 		client.IgnoreNotFound(cmErr), client.IgnoreNotFound(deployErr),
 		client.IgnoreNotFound(apiserverDeployErr), client.IgnoreNotFound(serviceErr),
-		client.IgnoreNotFound(ingressErr))
+		client.IgnoreNotFound(ingressErr), client.IgnoreNotFound(nsErr))
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, err)
@@ -305,11 +313,15 @@ func (s *Server) getInstanceStatus(ctx context.Context, namespace string) []Inst
 		s.getCRDStatus(ctx, "users.linuxsuren.github.io"),
 		s.getDeploymentStatus(ctx, namespace, "manager"),
 		s.getDeploymentStatus(ctx, namespace, "apiserver-deploy"),
-		s.getServiceStatus(ctx, namespace, "apiserver"),
-		s.getClusterRoleStatus(ctx, "manager-role"),
-		s.getClusterRoleBindingStatus(ctx, "manager-rolebinding"),
+		s.getServiceStatus(ctx, namespace, "apiserver-service"),
+		s.getClusterRoleStatus(ctx, "role"),
+		s.getClusterRoleBindingStatus(ctx, "role_binding"),
 		s.getConfigmapStatus(ctx, namespace, "config"),
-		s.getIngressStatus(ctx, namespace, "apiserver"),
+		s.getIngressStatus(ctx, namespace, "ingress"),
+		{
+			Component: "Namespace",
+			Name:      s.SystemNamespace,
+		},
 	}
 }
 
@@ -332,80 +344,84 @@ func (s *Server) getCRDStatus(ctx context.Context, name string) InstanceStatus {
 
 func (s *Server) getDeploymentStatus(ctx context.Context, namespace, name string) InstanceStatus {
 	deploy := getDeployment(name + ".yaml")
-	if deploy, err := s.Client.AppsV1().Deployments(namespace).Get(ctx, deploy.Name, metav1.GetOptions{}); err == nil {
+	if deploy, err := s.Client.AppsV1().Deployments(namespace).Get(ctx, deploy.GetName(), metav1.GetOptions{}); err == nil {
 		return InstanceStatus{
 			Component: "Deployment",
-			Name:      name,
+			Name:      deploy.GetName(),
 			Status:    fmt.Sprintf("installed: %d/%d", deploy.Status.ReadyReplicas, deploy.Status.Replicas),
 		}
 	} else {
 		return InstanceStatus{
 			Component: "Deployment",
-			Name:      name,
+			Name:      deploy.GetName(),
 			Status:    "not installed",
 		}
 	}
 }
 
 func (s *Server) getServiceStatus(ctx context.Context, namespace, name string) InstanceStatus {
-	if _, err := s.Client.CoreV1().Services(namespace).Get(ctx, name, metav1.GetOptions{}); err == nil {
+	service := getService(name + ".yaml")
+	if _, err := s.Client.CoreV1().Services(namespace).Get(ctx, service.GetName(), metav1.GetOptions{}); err == nil {
 		return InstanceStatus{
 			Component: "Service",
-			Name:      name,
+			Name:      service.GetName(),
 			Status:    "installed",
 		}
 	} else {
 		return InstanceStatus{
 			Component: "Service",
-			Name:      name,
+			Name:      service.GetName(),
 			Status:    "not installed",
 		}
 	}
 }
 
 func (s *Server) getClusterRoleStatus(ctx context.Context, name string) InstanceStatus {
-	if _, err := s.Client.RbacV1().ClusterRoles().Get(ctx, name, metav1.GetOptions{}); err == nil {
+	cr := getClusterRole(name + ".yaml")
+	if _, err := s.Client.RbacV1().ClusterRoles().Get(ctx, cr.GetName(), metav1.GetOptions{}); err == nil {
 		return InstanceStatus{
 			Component: "ClusterRole",
-			Name:      name,
+			Name:      cr.GetName(),
 			Status:    "installed",
 		}
 	} else {
 		return InstanceStatus{
 			Component: "ClusterRole",
-			Name:      name,
+			Name:      cr.GetName(),
 			Status:    "not installed",
 		}
 	}
 }
 
 func (s *Server) getClusterRoleBindingStatus(ctx context.Context, name string) InstanceStatus {
-	if _, err := s.Client.RbacV1().ClusterRoleBindings().Get(ctx, name, metav1.GetOptions{}); err == nil {
+	crb := getClusterRoleBinding(name + ".yaml")
+	if _, err := s.Client.RbacV1().ClusterRoleBindings().Get(ctx, crb.GetName(), metav1.GetOptions{}); err == nil {
 		return InstanceStatus{
 			Component: "ClusterRoleBinding",
-			Name:      name,
+			Name:      crb.GetName(),
 			Status:    "installed",
 		}
 	} else {
 		return InstanceStatus{
 			Component: "ClusterRoleBinding",
-			Name:      name,
+			Name:      crb.GetName(),
 			Status:    "not installed",
 		}
 	}
 }
 
 func (s *Server) getConfigmapStatus(ctx context.Context, namespace, name string) InstanceStatus {
-	if _, err := s.Client.CoreV1().ConfigMaps(namespace).Get(ctx, name, metav1.GetOptions{}); err == nil {
+	configmap := getConfigMap(name + ".yaml")
+	if _, err := s.Client.CoreV1().ConfigMaps(namespace).Get(ctx, configmap.GetName(), metav1.GetOptions{}); err == nil {
 		return InstanceStatus{
 			Component: "ConfigMap",
-			Name:      name,
+			Name:      configmap.GetName(),
 			Status:    "installed",
 		}
 	} else {
 		return InstanceStatus{
 			Component: "ConfigMap",
-			Name:      name,
+			Name:      configmap.GetName(),
 			Status:    "not installed",
 		}
 	}
@@ -413,16 +429,17 @@ func (s *Server) getConfigmapStatus(ctx context.Context, namespace, name string)
 
 // getIngressStatus
 func (s *Server) getIngressStatus(ctx context.Context, namespace, name string) InstanceStatus {
-	if _, err := s.Client.NetworkingV1().Ingresses(namespace).Get(ctx, name, metav1.GetOptions{}); err == nil {
+	ingress := getIngress(name + ".yaml")
+	if _, err := s.Client.NetworkingV1().Ingresses(namespace).Get(ctx, ingress.GetName(), metav1.GetOptions{}); err == nil {
 		return InstanceStatus{
 			Component: "Ingress",
-			Name:      name,
+			Name:      ingress.GetName(),
 			Status:    "installed",
 		}
 	} else {
 		return InstanceStatus{
 			Component: "Ingress",
-			Name:      name,
+			Name:      ingress.GetName(),
 			Status:    "not installed",
 		}
 	}
