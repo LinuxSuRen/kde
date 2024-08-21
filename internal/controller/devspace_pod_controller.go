@@ -50,6 +50,9 @@ type DevSpacePodPodReconciler struct {
 // below rbac required when retrieving the resource lock for leader election
 // +kubebuilder:rbac:groups="coordination.k8s.io",resources=leases,verbs=get;create;update
 // +kubebuilder:rbac:groups="",resources=events,verbs=create
+// below rbac required when retrieving the metrics
+// +kubebuilder:rbac:groups="metrics.k8s.io",resources=pods,verbs=get;list;watch
+// +kubebuilder:rbac:groups="metrics.k8s.io",resources=nodes,verbs=get;list;watch
 
 func (r *DevSpacePodPodReconciler) Reconcile(ctx context.Context, req ctrl.Request) (result ctrl.Result, err error) {
 	r.ctx = ctx

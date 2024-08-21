@@ -132,6 +132,7 @@ import { NewEmptyDevSpace } from './types';
 const route = useRoute();
 const devspace = ref(NewEmptyDevSpace())
 
+const loadData = () => {
 fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, {}).
     then(res => res.json()).
     then((d) => {
@@ -186,6 +187,8 @@ fetch(`/api/devspace/${route.params.name}?namespace=${route.params.namespace}`, 
             plain: true,
         })
     })
+}
+loadData()
 
 const submitForm = () => {
     devspace.value.spec.replicas = devspace.value.spec.status ? 1 : 0
@@ -209,6 +212,9 @@ const submitForm = () => {
                 type: 'success',
                 plain: true,
             })
+        } else {
+            // throw exception
+            throw new Error("Update failed")
         }
     }).catch((e) => {
         ElMessage({
@@ -216,6 +222,8 @@ const submitForm = () => {
             type: 'error',
             plain: true,
         })
+    }).finally(() => {
+        loadData()
     })
 }
 

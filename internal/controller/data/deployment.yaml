@@ -89,15 +89,18 @@ spec:
               {{ if .Spec.Repository.Email }}
               git config --global user.email {{.Spec.Repository.Email}}
               {{ end }}
+              {{ if .Spec.Repository.URL }}
               git clone {{.Spec.Repository.URL}} --depth 1 --single-branch | exit 0
               {{ else }}
               echo "no repository given"
+              {{ end }}
               {{ end }}
               {{ if .Spec.InitScript }}
               {{ .Spec.InitScript }}
               {{ else }}
               echo "no custom script given"
               {{ end }}
+              touch /var/lib/dpkg/status
           volumeMounts:
             - mountPath: /home/workspace
               name: cache
@@ -110,6 +113,9 @@ spec:
               subPath: tmp
             - mountPath: /var/data/openvscode-server-back/data/Machine
               name: config
+            - mountPath: /var/lib/dpkg
+              name: cache
+              subPath: dpkg
           securityContext:
             allowPrivilegeEscalation: true
             runAsUser: 0
@@ -140,6 +146,7 @@ spec:
             allowPrivilegeEscalation: true
             runAsUser: 0
             privileged: true
+            readOnlyRootFilesystem: true
           volumeMounts:
             - mountPath: /home/workspace
               name: cache
@@ -156,6 +163,15 @@ spec:
             - mountPath: /var/lib/apt
               name: cache
               subPath: apt
+            - mountPath: /var/lib/dpkg
+              name: cache
+              subPath: dpkg
+            - mountPath: /var/log
+              name: cache
+              subPath: log
+            - mountPath: /usr/share/doc
+              name: cache
+              subPath: doc
             - mountPath: /var/cache
               name: cache
               subPath: cache
@@ -185,6 +201,7 @@ spec:
             allowPrivilegeEscalation: true
             runAsUser: 0
             privileged: true
+            readOnlyRootFilesystem: true
           volumeMounts:
             - mountPath: /var/lib/docker
               name: cache
@@ -194,16 +211,23 @@ spec:
               readOnly: false
             - mountPath: /etc/docker
               name: config
+            - mountPath: /certs
+              name: cache
+              subPath: certs
         {{end}}
         {{if and .Spec.Services.Redis .Spec.Services.Redis.Enabled}}
         - image: ghcr.io/linuxsuren/library/redis:7.0.14
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: redis
+          securityContext:
+            readOnlyRootFilesystem: true
         {{end}}
         {{if and .Spec.Services.MySQL .Spec.Services.MySQL.Enabled}}
         - image: ghcr.io/linuxsuren/library/mysql:8.2.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: mysql
+          securityContext:
+            readOnlyRootFilesystem: true
           env:
           - name: MYSQL_ROOT_PASSWORD
             value: {{or .Spec.Services.MySQL.Password "root"}}
@@ -213,11 +237,19 @@ spec:
             - mountPath: /var/lib/mysql
               name: cache
               subPath: mysql
+            - mountPath: /tmp
+              name: cache
+              subPath: tmp
+            - mountPath: /var/run/mysqld
+              name: cache
+              subPath: mysqld
         {{end}}
         {{if and .Spec.Services.Postgres .Spec.Services.Postgres.Enabled}}
         - image: ghcr.io/linuxsuren/library/postgres:16.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: postgres
+          securityContext:
+            readOnlyRootFilesystem: true
           env:
           - name: POSTGRES_PASSWORD
             value: {{or .Spec.Services.Postgres.Password "root"}}
@@ -232,6 +264,8 @@ spec:
         - image: ghcr.io/linuxsuren/tdengine/tdengine:3.3.2.0
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: taos
+          securityContext:
+            readOnlyRootFilesystem: true
           volumeMounts:
             - mountPath: /var/lib/taos
               name: cache
@@ -241,6 +275,8 @@ spec:
         - image: ghcr.io/linuxsuren/library/rabbitmq:3.13.6
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: rabbitmq
+          securityContext:
+            readOnlyRootFilesystem: true
           env:
           - name: RABBITMQ_DEFAULT_USER
             value: {{or .Spec.Services.RabbitMQ.Username "guest"}}
