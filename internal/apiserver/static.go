@@ -73,8 +73,16 @@ func handleStaticFilesRequest(c *gin.Context) {
 }
 
 func RegisterStaticFilesHandle(r ginhttp.GinEngine) {
-	r.GET("/", handleStaticFilesRequest)
-	r.GET("/index.html", handleStaticFilesRequest)
-	r.GET("/favicon.ico", handleStaticFilesRequest)
-	r.GET("/assets/:asset", handleStaticFilesRequest)
+	registerMultiplePaths(r, handleStaticFilesRequest,
+		"/", "/index.html",
+		"/favicon.ico", "/assets/:asset")
+	registerMultiplePaths(r, func(ctx *gin.Context) {
+		ctx.Redirect(http.StatusMovedPermanently, "/")
+	}, "/dashboard", "/system", "dev")
+}
+
+func registerMultiplePaths(r ginhttp.GinEngine, handler gin.HandlerFunc, paths ...string) {
+	for _, path := range paths {
+		r.GET(path, handler)
+	}
 }
