@@ -73,4 +73,9 @@ func TestSetDefaultConfig(t *testing.T) {
 		verify(t, devspace, config)
 		assert.Equal(t, "another", devspace.Spec.Host)
 	})
+
+	t.Run("config is nil", func(t *testing.T) {
+		devspace := &v1alpha1.DevSpace{}
+		setDefaultConfig(devspace, nil)
+	})
 }

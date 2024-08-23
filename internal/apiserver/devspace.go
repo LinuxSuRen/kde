@@ -56,7 +56,8 @@ func (s *Server) CreateDevSpace(c *gin.Context) {
 	if err := c.BindJSON(devSpace); err != nil {
 		c.Error(err)
 	} else {
-		config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(namespace), "config")
+		cm := getConfigMap("config.yaml")
+		config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(s.SystemNamespace), cm.GetName())
 		if err != nil {
 			c.Error(err)
 		}
@@ -195,10 +196,9 @@ func (s *Server) GetDevSpaceLanguages(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err)
 	} else {
 		cm := getConfigMap("config.yaml")
-		cm.SetNamespace("default")
 		ctx := c.Request.Context()
 
-		if config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(cm.GetNamespace()), cm.GetName()); err == nil {
+		if config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(s.SystemNamespace), cm.GetName()); err == nil {
 			for _, lan := range config.Languages {
 				lan.Name = strings.TrimSpace(lan.Name)
 				lan.Image = strings.TrimSpace(lan.Image)

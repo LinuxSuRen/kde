@@ -76,6 +76,9 @@ func (s *Server) UpdateConfig(c *gin.Context) {
 }
 
 func setDefaultConfig(devspace *v1alpha1.DevSpace, config *core.Config) {
+	if config == nil {
+		return
+	}
 	if devspace.Annotations == nil {
 		devspace.Annotations = make(map[string]string)
 	}
