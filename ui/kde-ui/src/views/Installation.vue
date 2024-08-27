@@ -19,7 +19,10 @@ const installForm = reactive({
     image: '',
 })
 
-const instanceStatusData = ref()
+const instanceStatusData = ref({
+    status: [],
+    namespace: '',
+})
 const installStatusLoading = ref(true)
 
 const loadInstanceStatusData = () => {
@@ -28,6 +31,9 @@ const loadInstanceStatusData = () => {
         method: 'GET'
     }).then(res => res.json()).then(d => {
         instanceStatusData.value = d
+        if (installForm.namespace === '') {
+            installForm.namespace = d.namespace
+        }
     }).finally(() => {
         installStatusLoading.value = false
     })
@@ -184,7 +190,7 @@ const loadClusterInfo = () => {
 
                 <div>
                     <div>Instance status:</div>
-                    <el-table :data="instanceStatusData" style="width: 100%">
+                    <el-table :data="instanceStatusData.status" style="width: 100%">
                         <el-table-column prop="component" label="Component" width="150" />
                         <el-table-column prop="name" label="Name" />
                         <el-table-column prop="status" label="status" width="150" />

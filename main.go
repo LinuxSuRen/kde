@@ -45,7 +45,7 @@ func main() {
 	flags.StringVar(&opt.providerName, "oauth-provider-name", "", "The OAuth provider name")
 	flags.StringVar(&opt.clientID, "oauth-client-id", "", "The OAuth client ID")
 	flags.StringVar(&opt.clientSecret, "oauth-client-secret", "", "The OAuth client secret")
-	flags.StringVar(&opt.systemNamespace, "system-namespace", "kde-system", "The system namespace")
+	flags.StringVar(&opt.systemNamespace, "system-namespace", "", "The system namespace")
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}

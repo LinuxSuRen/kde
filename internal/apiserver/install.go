@@ -281,9 +281,17 @@ func (s *Server) ServerImages(c *gin.Context) {
 	c.JSON(http.StatusOK, images)
 }
 
+type Installation struct {
+	Status    []InstanceStatus `json:"status"`
+	Namespace string           `json:"namespace"`
+}
+
 func (s *Server) InstanceStatus(c *gin.Context) {
 	ctx := c.Request.Context()
-	c.JSON(http.StatusOK, s.getInstanceStatus(ctx, s.SystemNamespace))
+	c.JSON(http.StatusOK, Installation{
+		Status:    s.getInstanceStatus(ctx, s.SystemNamespace),
+		Namespace: s.SystemNamespace,
+	})
 }
 
 func (s *Server) InstanceStatusWS(c *gin.Context) {
@@ -318,10 +326,6 @@ func (s *Server) getInstanceStatus(ctx context.Context, namespace string) []Inst
 		s.getClusterRoleBindingStatus(ctx, "role_binding"),
 		s.getConfigmapStatus(ctx, namespace, "config"),
 		s.getIngressStatus(ctx, namespace, "ingress"),
-		{
-			Component: "Namespace",
-			Name:      s.SystemNamespace,
-		},
 	}
 }
 

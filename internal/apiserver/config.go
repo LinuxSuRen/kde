@@ -27,7 +27,7 @@ import (
 
 func (s *Server) GetConfig(c *gin.Context) {
 	ctx := c.Request.Context()
-	namespace := getNamespaceFromQuery(c)
+	namespace := s.SystemNamespace
 
 	cm := getConfigMap("config.yaml")
 	cm.SetNamespace(namespace)
@@ -41,7 +41,7 @@ func (s *Server) GetConfig(c *gin.Context) {
 
 func (s *Server) UpdateConfig(c *gin.Context) {
 	ctx := c.Request.Context()
-	namespace := getNamespaceFromQuery(c)
+	namespace := s.SystemNamespace
 
 	var err error
 	config := &core.Config{}

@@ -9,6 +9,9 @@ data:
     {
       "insecure-registries": [
         "http://172.11.0.6:30002"
+      ],
+      "registry-mirrors": [
+        "https://docker.m.daocloud.io"
       ]
     }
   id_rsa: |

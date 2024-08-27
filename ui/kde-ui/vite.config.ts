@@ -20,5 +20,8 @@ export default defineConfig({
         changeOrigin: true,
       }
     }
+  },
+  define: {
+    'mode': {}
   }
 })
