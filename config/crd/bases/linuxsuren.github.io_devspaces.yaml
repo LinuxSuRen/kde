@@ -137,6 +137,10 @@ spec:
                         type: boolean
                       image:
                         type: string
+                      insecureRegistries:
+                        items:
+                          type: string
+                        type: array
                     type: object
                   mysql:
                     properties:
@@ -149,6 +153,13 @@ spec:
                       password:
                         type: string
                       username:
+                        type: string
+                    type: object
+                  mysqlUI:
+                    properties:
+                      enabled:
+                        type: boolean
+                      image:
                         type: string
                     type: object
                   postgres:

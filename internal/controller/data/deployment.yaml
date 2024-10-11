@@ -223,7 +223,11 @@ spec:
             readOnlyRootFilesystem: true
         {{end}}
         {{if and .Spec.Services.MySQL .Spec.Services.MySQL.Enabled}}
+        {{ if .Spec.Services.MySQL.Image }}
+        - image: {{ .Spec.Services.MySQL.Image }}
+        {{ else }}
         - image: ghcr.io/linuxsuren/library/mysql:8.2.0
+        {{ end }}
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: mysql
           securityContext:
@@ -244,8 +248,24 @@ spec:
               name: cache
               subPath: mysqld
         {{end}}
+        {{if and .Spec.Services.MySQLUI .Spec.Services.MySQLUI.Enabled}}
+        {{ if .Spec.Services.MySQLUI.Image }}
+        - image: {{ .Spec.Services.MySQLUI.Image }}
+        {{ else }}
+        - image: ghcr.io/linuxsuren/library/phpmyadmin:5.2.1-fpm-alpine
+        {{ end }}
+          imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
+          name: mysqlUI
+          env:
+          - name: PMA_ARBITRARY
+            value: "1"
+        {{end}}
         {{if and .Spec.Services.Postgres .Spec.Services.Postgres.Enabled}}
+        {{ if .Spec.Services.Postgres.Image }}
+        - image: {{ .Spec.Services.Postgres.Image }}
+        {{ else }}
         - image: ghcr.io/linuxsuren/library/postgres:16.0
+        {{ end }}
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: postgres
           securityContext:
@@ -261,7 +281,11 @@ spec:
               subPath: postgres
         {{end}}
         {{if and .Spec.Services.TDEngine .Spec.Services.TDEngine.Enabled}}
+        {{ if .Spec.Services.TDEngine.Image }}
+        - image: {{ .Spec.Services.TDEngine.Image }}
+        {{ else }}
         - image: ghcr.io/linuxsuren/tdengine/tdengine:3.3.2.0
+        {{ end }}
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: taos
           securityContext:
@@ -272,7 +296,11 @@ spec:
               subPath: taos
         {{end}}
         {{if and .Spec.Services.RabbitMQ .Spec.Services.RabbitMQ.Enabled}}
+        {{ if .Spec.Services.RabbitMQ.Image }}
+        - image: {{ .Spec.Services.RabbitMQ.Image }}
+        {{ else }}
         - image: ghcr.io/linuxsuren/library/rabbitmq:3.13.6
+        {{ end }}
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: rabbitmq
           securityContext:

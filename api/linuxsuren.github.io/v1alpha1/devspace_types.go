@@ -53,6 +53,7 @@ type DevSpaceSpec struct {
 type Services struct {
 	Docker   *Docker   `json:"docker,omitempty"`
 	MySQL    *MySQL    `json:"mysql,omitempty"`
+	MySQLUI  *MySQLUI  `json:"mysqlUI,omitempty"`
 	Postgres *Postgres `json:"postgres,omitempty"`
 	TDEngine *TDEngine `json:"tdEngine,omitempty"`
 	RabbitMQ *RabbitMQ `json:"rabbitMQ,omitempty"`
@@ -60,8 +61,9 @@ type Services struct {
 }
 
 type Docker struct {
-	Enabled bool   `json:"enabled,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Enabled            bool     `json:"enabled,omitempty"`
+	Image              string   `json:"image,omitempty"`
+	InsecureRegistries []string `json:"insecureRegistries,omitempty"`
 }
 
 type MySQL struct {
@@ -70,6 +72,11 @@ type MySQL struct {
 	Password string `json:"password,omitempty"`
 	Database string `json:"database,omitempty"`
 	Image    string `json:"image,omitempty"`
+}
+
+type MySQLUI struct {
+	Enabled bool   `json:"enabled,omitempty"`
+	Image   string `json:"image,omitempty"`
 }
 
 type Postgres struct {

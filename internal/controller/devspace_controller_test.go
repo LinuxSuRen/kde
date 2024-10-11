@@ -85,11 +85,43 @@ func TestGitPodTemplateRender(t *testing.T) {
 	})
 
 	t.Run("configmap", func(t *testing.T) {
-		configmap, err := turnTemplateToUnstructured(gitpodConfigMap, gitpod)
+		configmap, err := turnTemplateToUnstructured(gitpodConfigMap, gitpod.DeepCopy())
 		assert.NoError(t, err, err)
 		data, err := configmap.MarshalJSON()
 		assert.NoError(t, err, err)
 		assert.Contains(t, string(data), `"id_rsa":"---key---\nprivateKey\n---end---\n"`, string(data))
+		assert.NotContains(t, string(data), "daemon.json")
+	})
+
+	t.Run("set insecure registry", func(t *testing.T) {
+		gitpodInsecure := gitpod.DeepCopy()
+		gitpodInsecure.Spec.Services.Docker = &v1alpha1.Docker{
+			Enabled: true,
+			InsecureRegistries: []string{
+				"example.com",
+				"foo.com",
+			},
+		}
+		configmap, err := turnTemplateToUnstructured(gitpodConfigMap, gitpodInsecure)
+		assert.NoError(t, err, err)
+		data, err := configmap.MarshalJSON()
+		assert.NoError(t, err, err)
+		assert.Contains(t, string(data), `insecure-registries`)
+		assert.Contains(t, string(data), `\"example.com\",`)
+		assert.Contains(t, string(data), `\"foo.com\"`)
+	})
+
+	t.Run("mysql ui", func(t *testing.T) {
+		gitpodMysqlUI := gitpod.DeepCopy()
+		gitpodMysqlUI.Spec.Services.MySQLUI = &v1alpha1.MySQLUI{
+			Enabled: true,
+			Image:   "foo.image.mysql.ui",
+		}
+		configmap, err := turnTemplateToUnstructured(gitpodDeployment, gitpodMysqlUI)
+		assert.NoError(t, err, err)
+		data, err := configmap.MarshalJSON()
+		assert.NoError(t, err, err)
+		assert.Contains(t, string(data), `foo.image.mysql.ui`)
 	})
 }
 

@@ -5,12 +5,16 @@ data:
         "webhook.interval": 3000,
         "webhook.address": "http://{{index .ObjectMeta.Annotations "linuxsuren.github.io/service-name"}}.{{index .ObjectMeta.Annotations "linuxsuren.github.io/service-namespace"}}.svc:8080/webhook?namespace={{.ObjectMeta.Namespace}}&devspace={{.ObjectMeta.Name}}"
     }
+  {{ if and .Spec.Services.Docker .Spec.Services.Docker.Enabled }}
   daemon.json: |
     {
       "insecure-registries": [
-        "http://172.11.0.6:30002"
+        {{ range $index,$item := .Spec.Services.Docker.InsecureRegistries }}
+        "{{ $item }}"{{ if not (eq $index (sub (len .) 1)) }}, {{ end }}
+        {{ end }}
       ]
     }
+  {{ end }}
   id_rsa: |
 {{ .Spec.Auth.SSHPrivateKey | indent 4 }}
 kind: ConfigMap
