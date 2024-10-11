@@ -101,7 +101,7 @@ func (r *DevSpaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (r
 	}
 	setDefaultValueForDevSpace(devSpace, config.Host)
 	devSpace.Annotations[v1alpha1.AnnoKeyServiceNamespace] = r.SystemNamespace
-	devSpace.Annotations[v1alpha1.AnnoKeyServiceName] = "apiserver"
+	devSpace.Annotations[v1alpha1.AnnoKeyServiceName] = "kde-apiserver"
 	configmap, configmapErr := turnTemplateToUnstructured(gitpodConfigMap, devSpace)
 	secret, secretErr := turnTemplateToUnstructured(gitpodSecret, devSpace)
 	pvc, pvcErr := turnTemplateToUnstructured(gitpodPvc, devSpace)
