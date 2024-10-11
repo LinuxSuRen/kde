@@ -56,7 +56,7 @@ func (s *Server) CreateDevSpace(c *gin.Context) {
 	if err := c.BindJSON(devSpace); err != nil {
 		c.Error(err)
 	} else {
-		config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(namespace), "config")
+		config, err := core.GetConfigFromConfigMap(ctx, s.Client.CoreV1().ConfigMaps(namespace), "kde-config")
 		if err != nil {
 			c.Error(err)
 		}
