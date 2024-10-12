@@ -109,6 +109,7 @@ func TestGitPodTemplateRender(t *testing.T) {
 		assert.Contains(t, string(data), `insecure-registries`)
 		assert.Contains(t, string(data), `\"example.com\",`)
 		assert.Contains(t, string(data), `\"foo.com\"`)
+		assert.NotContains(t, string(data), `\"foo.com\",`)
 	})
 
 	t.Run("mysql ui", func(t *testing.T) {

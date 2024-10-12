@@ -6,11 +6,12 @@ data:
         "webhook.address": "http://{{index .ObjectMeta.Annotations "linuxsuren.github.io/service-name"}}.{{index .ObjectMeta.Annotations "linuxsuren.github.io/service-namespace"}}.svc:8080/webhook?namespace={{.ObjectMeta.Namespace}}&devspace={{.ObjectMeta.Name}}"
     }
   {{ if and .Spec.Services.Docker .Spec.Services.Docker.Enabled }}
+  {{$regs:=.Spec.Services.Docker.InsecureRegistries}}
   daemon.json: |
     {
       "insecure-registries": [
-        {{ range $index,$item := .Spec.Services.Docker.InsecureRegistries }}
-        "{{ $item }}"{{ if not (eq $index (sub (len .) 1)) }}, {{ end }}
+        {{ range $index,$item := $regs }}
+        "{{ $item }}"{{ if not (eq $index (sub (len $regs) 1)) }}, {{ end }}
         {{ end }}
       ]
     }
