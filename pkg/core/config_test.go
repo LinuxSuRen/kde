@@ -90,9 +90,9 @@ func TestCleanInvalidLanguages(t *testing.T) {
 	languages := core.CleanInvalidLanguages([]core.Language{{
 		Name: "go",
 	}, {
-        Name: "go",
-        Image: "golang:latest",
-    }, {
+		Name:  "go",
+		Image: "golang:latest",
+	}, {
 		Image: "golang:latest",
 	}})
 
