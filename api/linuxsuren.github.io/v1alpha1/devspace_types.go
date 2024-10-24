@@ -65,6 +65,11 @@ type Docker struct {
 	Enabled            bool     `json:"enabled,omitempty"`
 	Image              string   `json:"image,omitempty"`
 	InsecureRegistries []string `json:"insecureRegistries,omitempty"`
+	RegistryMirrors    []string `json:"registryMirrors,omitempty"`
+	// +kubebuilder:default:maxConcurrentUploads=2
+	MaxConcurrentUploads int `json:"maxConcurrentUploads,omitempty"`
+	// +kubebuilder:default:maxConcurrentDownloads=2
+	MaxConcurrentDownloads int `json:"maxConcurrentDownloads,omitempty"`
 }
 
 type MySQL struct {
