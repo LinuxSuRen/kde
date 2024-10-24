@@ -146,7 +146,7 @@ spec:
             allowPrivilegeEscalation: true
             runAsUser: 0
             privileged: true
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: {{.Spec.ReadOnlyRootFilesystem}}
           volumeMounts:
             - mountPath: /home/workspace
               name: cache
@@ -201,7 +201,7 @@ spec:
             allowPrivilegeEscalation: true
             runAsUser: 0
             privileged: true
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: {{.Spec.ReadOnlyRootFilesystem}}
           volumeMounts:
             - mountPath: /var/lib/docker
               name: cache
@@ -220,7 +220,7 @@ spec:
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: redis
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: {{.Spec.ReadOnlyRootFilesystem}}
         {{end}}
         {{if and .Spec.Services.MySQL .Spec.Services.MySQL.Enabled}}
         {{ if .Spec.Services.MySQL.Image }}
@@ -231,7 +231,7 @@ spec:
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: mysql
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: {{.Spec.ReadOnlyRootFilesystem}}
           env:
           - name: MYSQL_ROOT_PASSWORD
             value: {{or .Spec.Services.MySQL.Password "root"}}
@@ -269,7 +269,7 @@ spec:
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: postgres
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: {{.Spec.ReadOnlyRootFilesystem}}
           env:
           - name: POSTGRES_PASSWORD
             value: {{or .Spec.Services.Postgres.Password "root"}}
@@ -289,7 +289,7 @@ spec:
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: taos
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: {{.Spec.ReadOnlyRootFilesystem}}
           volumeMounts:
             - mountPath: /var/lib/taos
               name: cache
@@ -304,7 +304,7 @@ spec:
           imagePullPolicy: {{index .ObjectMeta.Annotations "linuxsuren.github.io/image-pull-policy"}}
           name: rabbitmq
           securityContext:
-            readOnlyRootFilesystem: true
+            readOnlyRootFilesystem: {{.Spec.ReadOnlyRootFilesystem}}
           env:
           - name: RABBITMQ_DEFAULT_USER
             value: {{or .Spec.Services.RabbitMQ.Username "guest"}}

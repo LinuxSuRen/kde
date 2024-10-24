@@ -104,6 +104,8 @@ spec:
                 default: 4Gi
                 description: Memory is the memory limit
                 type: string
+              readOnlyRootFilesystem:
+                type: boolean
               replicas:
                 default: 1
                 description: Replicas is the number of replicas

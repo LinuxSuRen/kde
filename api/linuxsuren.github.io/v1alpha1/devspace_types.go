@@ -34,8 +34,9 @@ type DevSpaceSpec struct {
 	Memory string `json:"memory,omitempty"`
 	// Storage is the storage size
 	// +kubebuilder:default:storage="50Gi"
-	Storage string `json:"storage,omitempty"`
-	Image   string `json:"image,omitempty"`
+	Storage                string `json:"storage,omitempty"`
+	Image                  string `json:"image,omitempty"`
+	ReadOnlyRootFilesystem bool   `json:"readOnlyRootFilesystem,omitempty"`
 	// Replicas is the number of replicas
 	// +kubebuilder:default:replicas=1
 	Replicas *int32 `json:"replicas,omitempty"`
