@@ -143,6 +143,16 @@ spec:
                         items:
                           type: string
                         type: array
+                      maxConcurrentDownloads:
+                        default: 2
+                        type: integer
+                      maxConcurrentUploads:
+                        default: 2
+                        type: integer
+                      registryMirrors:
+                        items:
+                          type: string
+                        type: array
                     type: object
                   mysql:
                     properties:

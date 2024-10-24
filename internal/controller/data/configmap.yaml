@@ -7,13 +7,21 @@ data:
     }
   {{ if and .Spec.Services.Docker .Spec.Services.Docker.Enabled }}
   {{$regs:=.Spec.Services.Docker.InsecureRegistries}}
+  {{$mirrors:=.Spec.Services.Docker.RegistryMirrors}}
   daemon.json: |
     {
       "insecure-registries": [
         {{ range $index,$item := $regs }}
         "{{ $item }}"{{ if not (eq $index (sub (len $regs) 1)) }}, {{ end }}
         {{ end }}
-      ]
+      ],
+      "registry-mirrors": [
+        {{ range $index,$item := $mirrors }}
+        "{{ $item }}"{{ if not (eq $index (sub (len $regs) 1)) }}, {{ end }}
+        {{ end }}
+      ],
+      "max-concurrent-uploads": {{$mirrors:=.Spec.Services.Docker.MaxConcurrentUploads}},
+      "max-concurrent-downloads": {{$mirrors:=.Spec.Services.Docker.MaxConcurrentDownloads}}
     }
   {{ end }}
   id_rsa: |

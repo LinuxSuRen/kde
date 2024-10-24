@@ -5,6 +5,13 @@ metadata:
     app.kubernetes.io/name: kde
     app.kubernetes.io/managed-by: kustomize
   name: devspace-sample
-status:
-  phase: Ready
-  link: https://kde.linuxsuren.io
+spec:
+  services:
+    docker:
+      enabled: true
+      registryMirrors:
+        - https://docker.m.daocloud.io
+      insecureRegistries:
+        - 192.168.0.100:5000
+      maxConcurrentUploads: 10
+      maxConcurrentDownloads: 10
