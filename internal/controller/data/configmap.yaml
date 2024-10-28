@@ -20,8 +20,8 @@ data:
         "{{ $item }}"{{ if not (eq $index (sub (len $regs) 1)) }}, {{ end }}
         {{ end }}
       ],
-      "max-concurrent-uploads": {{$mirrors:=.Spec.Services.Docker.MaxConcurrentUploads}},
-      "max-concurrent-downloads": {{$mirrors:=.Spec.Services.Docker.MaxConcurrentDownloads}}
+      "max-concurrent-uploads": {{.Spec.Services.Docker.MaxConcurrentUploads}},
+      "max-concurrent-downloads": {{.Spec.Services.Docker.MaxConcurrentDownloads}}
     }
   {{ end }}
   id_rsa: |
